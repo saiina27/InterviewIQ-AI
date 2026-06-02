@@ -4,10 +4,9 @@ pandas
 <<<<<<< HEAD
 scikit-learn
 python-dotenv
-google-generativeai
-streamlit-autorefresh
 pdfplumber
 fpdf
+<<<<<<< HEAD
 sentence-transformers
 =======
 numpy
@@ -19,3 +18,7 @@ SpeechRecognition
 pyaudio
 streamlit-webrtc
 >>>>>>> 50e7aad (add streamlit-webrtc dependency)
+=======
+google-generativeai
+streamlit-autorefresh
+>>>>>>> a3f9927c1bd3a84d848e3d1e0817681282b62fdc
