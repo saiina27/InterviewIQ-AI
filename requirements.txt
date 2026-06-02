@@ -1,5 +1,4 @@
 SpeechRecognition
-pyaudio
 streamlit-webrtc
 streamlit
 plotly
