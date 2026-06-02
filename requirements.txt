@@ -7,3 +7,7 @@ pandas
 numpy
 streamlit-webrtc
 av
+python-dotenv
+google-generativeai
+SpeechRecognition
+pyaudio
