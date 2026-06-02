@@ -7,3 +7,4 @@ google-generativeai
 streamlit-autorefresh
 pdfplumber
 fpdf
+sentence-transformers
