@@ -1,0 +1,49 @@
+{
+  "Python Developer": {
+    "Beginner": [
+      "What is Python?",
+      "What is OOP?"
+    ],
+    "Intermediate": [
+      "Difference between List and Tuple?",
+      "What are decorators?"
+    ],
+    "Advanced": [
+      "What is GIL in Python?",
+      "Explain multithreading."
+    ]
+  },
+
+  "Data Analyst": {
+    "Beginner": [
+      "What is Pandas?",
+      "What is Data Cleaning?"
+    ],
+    "Intermediate": [
+      "Difference between CSV and Excel?",
+      "What is Data Visualization?"
+    ],
+    "Advanced": [
+      "Explain ETL Process.",
+      "What is Data Warehousing?"
+    ]
+  },
+
+  "Web Developer": {
+    "Beginner": [
+      "What is HTML?",
+      "What is CSS?",
+      "What is JavaScript?"
+    ],
+    "Intermediate": [
+      "Difference between CSS and JavaScript?",
+      "What is Responsive Design?",
+      "What is DOM?"
+    ],
+    "Advanced": [
+      "Explain Event Bubbling in JavaScript.",
+      "Difference between Local Storage and Session Storage?",
+      "What is REST API?"
+    ]
+  }
+}

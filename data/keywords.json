@@ -1,0 +1,141 @@
+{
+"What is Python?": [
+"python",
+"high-level",
+"interpreted",
+"programming language"
+],
+
+"What is OOP?": [
+"object",
+"class",
+"inheritance",
+"polymorphism",
+"encapsulation"
+],
+
+"Difference between List and Tuple?": [
+"list",
+"tuple",
+"mutable",
+"immutable"
+],
+
+"What are decorators?": [
+"decorator",
+"function",
+"wrapper",
+"modify"
+],
+
+"What is GIL in Python?": [
+"gil",
+"global interpreter lock",
+"thread",
+"python"
+],
+
+"Explain multithreading.": [
+"thread",
+"multithreading",
+"concurrency",
+"parallel"
+],
+
+"What is Pandas?": [
+"pandas",
+"dataframe",
+"data",
+"analysis"
+],
+
+"What is Data Cleaning?": [
+"data",
+"cleaning",
+"missing",
+"duplicates"
+],
+
+"Difference between CSV and Excel?": [
+"csv",
+"excel",
+"spreadsheet",
+"file"
+],
+
+"What is Data Visualization?": [
+"visualization",
+"chart",
+"graph",
+"dashboard"
+],
+
+"Explain ETL Process.": [
+"extract",
+"transform",
+"load",
+"etl"
+],
+
+"What is Data Warehousing?": [
+"warehouse",
+"data",
+"storage",
+"analytics"
+],
+
+"What is HTML?": [
+"html",
+"markup",
+"webpage"
+],
+
+"What is CSS?": [
+"css",
+"style",
+"design"
+],
+
+"What is JavaScript?": [
+"javascript",
+"scripting",
+"interactive"
+],
+
+"Difference between CSS and JavaScript?": [
+"css",
+"styling",
+"javascript",
+"functionality"
+],
+
+"What is Responsive Design?": [
+"responsive",
+"mobile",
+"screen"
+],
+
+"What is DOM?": [
+"document",
+"object",
+"model"
+],
+
+"Explain Event Bubbling in JavaScript.": [
+"event",
+"bubbling",
+"parent"
+],
+
+"Difference between Local Storage and Session Storage?": [
+"local",
+"session",
+"browser"
+],
+
+"What is REST API?": [
+"rest",
+"api",
+"http"
+]
+}

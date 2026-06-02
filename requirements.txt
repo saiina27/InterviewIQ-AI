@@ -1,0 +1,9 @@
+streamlit
+plotly
+opencv-python
+streamlit-autorefresh
+sentence-transformers
+pandas
+numpy
+streamlit-webrtc
+av
