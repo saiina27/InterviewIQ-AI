@@ -1,13 +1,9 @@
-SpeechRecognition
-pyaudio
-streamlit-webrtc
 streamlit
 plotly
 pandas
 scikit-learn
 python-dotenv
-google-generativeai
-streamlit-autorefresh
 pdfplumber
 fpdf
-sentence-transformers
+google-generativeai
+streamlit-autorefresh
