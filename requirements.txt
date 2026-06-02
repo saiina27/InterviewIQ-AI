@@ -1,13 +1,9 @@
 streamlit
 plotly
-opencv-python
-streamlit-autorefresh
-sentence-transformers
 pandas
-numpy
-streamlit-webrtc
-av
+scikit-learn
 python-dotenv
 google-generativeai
+streamlit-autorefresh
+streamlit-webrtc
 SpeechRecognition
-pyaudio
