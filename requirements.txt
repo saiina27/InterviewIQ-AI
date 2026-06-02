@@ -5,5 +5,4 @@ scikit-learn
 python-dotenv
 google-generativeai
 streamlit-autorefresh
-streamlit-webrtc
-SpeechRecognition
+pdfplumber
