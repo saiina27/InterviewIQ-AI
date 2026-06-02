@@ -1,6 +1,7 @@
 streamlit
 plotly
 pandas
+<<<<<<< HEAD
 scikit-learn
 python-dotenv
 google-generativeai
@@ -8,3 +9,13 @@ streamlit-autorefresh
 pdfplumber
 fpdf
 sentence-transformers
+=======
+numpy
+streamlit-webrtc
+av
+python-dotenv
+google-generativeai
+SpeechRecognition
+pyaudio
+streamlit-webrtc
+>>>>>>> 50e7aad (add streamlit-webrtc dependency)
