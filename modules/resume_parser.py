@@ -1,16 +1,23 @@
 import pdfplumber
+import re
 
 def extract_resume_text(pdf_file):
+    try:
+        text = ""
 
-    text = ""
+        with pdfplumber.open(pdf_file) as pdf:
+            for page in pdf.pages:
+                page_text = page.extract_text()
 
-    with pdfplumber.open(pdf_file) as pdf:
+                if page_text:
+                    text += page_text + "\n"
 
-        for page in pdf.pages:
+        # Remove extra spaces and blank lines
+        text = re.sub(r"\n+", "\n", text)
+        text = text.strip()
 
-            page_text = page.extract_text()
+        return text
 
-            if page_text:
-                text += page_text + "\n"
-
-    return text
+    except Exception as e:
+        print(f"Resume Parsing Error: {e}")
+        return ""

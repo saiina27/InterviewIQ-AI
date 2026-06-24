@@ -1,27 +1,46 @@
+import re
+
 SKILLS = [
-    "python",
-    "java",
-    "sql",
-    "machine learning",
-    "html",
-    "css",
-    "javascript",
-    "react",
-    "php",
-    "dbms",
-    "c++",
-    "data structures"
+    "Python",
+    "Java",
+    "C++",
+    "C",
+    "SQL",
+    "DBMS",
+    "HTML",
+    "CSS",
+    "JavaScript",
+    "React",
+    "Node.js",
+    "PHP",
+    "MongoDB",
+    "MySQL",
+    "Machine Learning",
+    "Deep Learning",
+    "Artificial Intelligence",
+    "Data Structures",
+    "Algorithms",
+    "OOP",
+    "Streamlit",
+    "OpenCV",
+    "Git",
+    "GitHub",
+    "Flask",
+    "Django",
+    "REST API"
 ]
 
 def detect_skills(text):
 
-    found_skills = []
+    detected = []
 
     text = text.lower()
 
     for skill in SKILLS:
 
-        if skill.lower() in text:
-            found_skills.append(skill)
+        pattern = r"\b" + re.escape(skill.lower()) + r"\b"
 
-    return found_skills
+        if re.search(pattern, text):
+            detected.append(skill)
+
+    return sorted(list(set(detected)))

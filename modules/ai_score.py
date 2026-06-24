@@ -1,27 +1,40 @@
-from sentence_transformers import SentenceTransformer, util
+def evaluate_answer(question, answer, skills):
+    answer = answer.lower().strip()
 
-model = SentenceTransformer("all-MiniLM-L6-v2")
+    if not answer:
+        return 0
 
+    score = 0
 
-def evaluate_answer(question, answer):
-    """
-    Returns AI-based semantic score (0-100)
-    """
+    # Length Score (20)
+    words = len(answer.split())
 
-    ideal_answers = {
-        "What is Python?": "Python is a high-level programming language used for web development, AI, automation and data science.",
-        "What is OOP?": "OOP is Object Oriented Programming based on objects and classes.",
-        "What is HTML?": "HTML is a markup language used to structure web pages.",
-        "What is CSS?": "CSS is used to style web pages and make them visually attractive.",
-        "What is JavaScript?": "JavaScript is used to make web pages interactive."
-    }
+    if words >= 30:
+        score += 20
+    elif words >= 15:
+        score += 15
+    elif words >= 5:
+        score += 10
 
-    reference = ideal_answers.get(question, question)
+    # Skill Match Score (40)
+    matched_skills = 0
 
-    embeddings = model.encode([answer, reference], convert_to_tensor=True)
+    for skill in skills:
+        if skill.lower() in answer:
+            matched_skills += 1
 
-    similarity = util.pytorch_cos_sim(embeddings[0], embeddings[1]).item()
+    score += min(matched_skills * 10, 40)
 
-    score = round(similarity * 100)
+    # Completeness (20)
+    if "." in answer or "," in answer:
+        score += 20
+    elif words > 10:
+        score += 10
 
-    return min(max(score, 0), 100)
+    # Communication (20)
+    if words > 20:
+        score += 20
+    elif words > 10:
+        score += 10
+
+    return min(score, 100)

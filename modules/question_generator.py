@@ -1,18 +1,60 @@
 def generate_questions(skills):
 
-    base_questions = []
+    questions = []
+
+    question_bank = {
+
+        "Python": [
+            "What are Python decorators?",
+            "Explain list vs tuple.",
+            "How does memory management work in Python?"
+        ],
+
+        "Java": [
+            "Explain JVM architecture.",
+            "What is multithreading in Java?",
+            "Difference between JDK, JRE and JVM?"
+        ],
+
+        "SQL": [
+            "What is normalization?",
+            "Explain different JOIN types.",
+            "Difference between DELETE and TRUNCATE?"
+        ],
+
+        "React": [
+            "What is Virtual DOM?",
+            "Explain React Hooks.",
+            "Difference between State and Props?"
+        ],
+
+        "Machine Learning": [
+            "Difference between supervised and unsupervised learning?",
+            "What is overfitting?",
+            "Explain train-test split."
+        ],
+
+        "OpenCV": [
+            "What is image processing?",
+            "How does face detection work?",
+            "Explain object detection."
+        ],
+
+        "Streamlit": [
+            "Why use Streamlit?",
+            "How does session_state work?",
+            "Advantages of Streamlit?"
+        ]
+    }
 
     for skill in skills:
 
-        base_questions.append(f"What is {skill}?")
-        base_questions.append(f"Explain real-world use of {skill}.")
-        base_questions.append(f"What are challenges in {skill}?")
+        if skill in question_bank:
+            questions.extend(question_bank[skill])
 
-    # AI style enhancement
-    if "python" in skills:
-        base_questions.append("Explain Python memory management.")
+        else:
+            questions.append(
+                f"Explain your experience with {skill}."
+            )
 
-    if "sql" in skills:
-        base_questions.append("Difference between JOIN types in SQL.")
-
-    return base_questions
+    return questions

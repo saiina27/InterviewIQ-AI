@@ -1,23 +1,24 @@
-import json
+import time
 import streamlit as st
-import plotly.graph_objects as go
+import os
 
-from modules.webcam import start_camera
 from modules.questions import load_questions
-from modules.ai_feedback import get_feedback
 from modules.resume_parser import extract_resume_text
 from modules.skill_detector import detect_skills
-from modules.question_generator import generate_questions
-from modules.pdf_report import generate_report
+from modules.ai_question_generator import generate_ai_questions
 from modules.speech import speech_to_text
+from modules.webcam import start_camera
+from modules.pdf_report import generate_report
 from modules.ai_score import evaluate_answer
-from streamlit_autorefresh import st_autorefresh
-from modules.resume_match import calculate_match
 
+
+@st.cache_data(show_spinner=False)
+def cached_ai_questions(skills, resume_text):
+    return generate_ai_questions(skills, resume_text)
 # ----------------------------
 # PAGE CONFIG
 # ----------------------------
-st.set_page_config(
+st.set_page_config (
     page_title="InterviewIQ AI",
     page_icon="🎤",
     layout="wide"
@@ -25,16 +26,17 @@ st.set_page_config(
 
 st.title("🎤 InterviewIQ AI")
 # ----------------------------
-# LOAD DATA
+# LOAD QUESTIONS
 # ----------------------------
 questions = load_questions()
 
-with open("data/keywords.json", "r") as file:
-    keywords = json.load(file)
 # ----------------------------
 # ROLE + DIFFICULTY
 # ----------------------------
-role = st.selectbox("Select Interview Role", list(questions.keys()))
+role = st.selectbox(
+    "Select Interview Role",
+    list(questions.keys())
+)
 
 difficulty = st.selectbox(
     "Select Difficulty",
@@ -42,8 +44,9 @@ difficulty = st.selectbox(
 )
 
 role_questions = questions[role][difficulty]
+
 # ----------------------------
-# SESSION STATE INIT
+# SESSION STATE
 # ----------------------------
 if "index" not in st.session_state:
     st.session_state.index = 0
@@ -51,242 +54,325 @@ if "index" not in st.session_state:
 if "answers" not in st.session_state:
     st.session_state.answers = []
 
-if "feedback_index" not in st.session_state:
-    st.session_state.feedback_index = None
+if "generated_questions" not in st.session_state:
+    st.session_state.generated_questions = None
+
+if "start_time" not in st.session_state:
+    st.session_state.start_time = time.time()
 
 if "voice_text" not in st.session_state:
-    st.session_state.voice_text = ""
+    st.session_state.voice_text = ""   
 
-if "time_left" not in st.session_state:
-    st.session_state.time_left = 60
+if "skills" not in st.session_state:
+    st.session_state.skills = []  
 
-if "camera_on" not in st.session_state:
-    st.session_state.camera_on = False
+if "interview_started" not in st.session_state:
+    st.session_state.interview_started = False   
 
-# reset on role change
-current_selection = f"{role}_{difficulty}"
+# ----------------------------
+# RESUME UPLOAD
+# ----------------------------
+st.subheader("📄 Upload Resume")
 
-if "last_selection" not in st.session_state:
-    st.session_state.last_selection = current_selection
+uploaded_file = st.file_uploader(
+    "Upload Resume PDF",
+    type=["pdf"]
+)
 
-if st.session_state.last_selection != current_selection:
-    st.session_state.index = 0
-    st.session_state.answers = []
-    st.session_state.feedback_index = None
-    st.session_state.time_left = 60
-    st.session_state.last_selection = current_selection
+if uploaded_file:
+
+    resume_text = extract_resume_text(uploaded_file)
+
+    st.success("✅ Resume Uploaded Successfully")
+
+    st.subheader("📄 Resume Preview")
+
+    st.text_area(
+        "Resume Text",
+        resume_text[:3000],
+        height=250
+    )
+
+    skills = detect_skills(resume_text)
+    st.session_state.skills = skills
+
+    st.subheader("🛠 Detected Skills")
+
+    if skills:
+        for skill in skills:
+            st.success(skill)
+    else:
+        st.warning("No skills detected")
+
+# ----------------------------
+# AI QUESTION GENERATION
+# ----------------------------
+if st.button("🤖 Generate AI Questions"):
+
+    with st.spinner("Generating AI Questions..."):
+
+        try:
+
+            st.session_state.generated_questions = cached_ai_questions(
+                tuple(skills),
+                resume_text
+            )
+
+            st.session_state.index = 0
+            st.session_state.answers = []
+            st.session_state.start_time = time.time()
+            st.session_state.interview_started = False
+
+            st.success("Questions Generated Successfully!")
+
+            st.rerun()
+
+        except Exception:
+
+            st.warning("⚠️ AI failed, using offline questions")
+
+            st.session_state.generated_questions = [
+                f"Explain your experience with {skills[0] if skills else 'your project'}",
+                "Tell me about your final year project",
+                "What challenges did you face?",
+                "How did you solve them?",
+                "Why should we hire you?"
+            ]
+
+            st.session_state.index = 0
+            st.session_state.answers = []
+            st.session_state.start_time = time.time()
+            st.session_state.interview_started = False
+
+            st.rerun()
+
+# ----------------------------
+# DISPLAY QUESTIONS
+# ----------------------------
+if st.session_state.generated_questions:
+
+    st.subheader("🤖 AI Generated Questions")
+
+    for q in st.session_state.generated_questions:
+        st.write("•", q)
+
+    if st.button("🚀 Start AI Interview"):
+
+        st.session_state.index = 0
+        st.session_state.answers = []
+        st.session_state.start_time = time.time()
+        st.session_state.interview_started = True
+
+        st.rerun()
 # ----------------------------
 # WEBCAM
 # ----------------------------
 st.subheader("📷 Webcam Monitoring")
-
-if st.button("Start Webcam"):
-    st.session_state.camera_on = True
-
-if st.session_state.camera_on:
+try:
     start_camera()
+except Exception as e:
+    st.warning(f"Webcam Error: {e}")
 # ----------------------------
-# RESUME UPLOAD
+# QUESTION SOURCE
 # ----------------------------
-uploaded_file = st.file_uploader("Upload Resume (PDF)", type=["pdf"])
-
-if uploaded_file:
-    resume_text = extract_resume_text(uploaded_file)
-    skills = detect_skills(resume_text)
-
-    st.subheader("Detected Skills")
-    st.write(skills)
-
-    match_score, matched_skills, required_skills = calculate_match(skills, role)
-
-    st.subheader("🎯 Resume Match Analysis")
-    st.metric("Resume Match Score", f"{match_score}%")
-
-    st.write("Matched Skills")
-    for s in matched_skills:
-        st.success(s)
-
-    st.write("Missing Skills")
-    for s in required_skills:
-        if s not in matched_skills:
-            st.warning(s)
-
-    st.subheader("Resume-Based Questions")
-    for q in generate_questions(skills):
-        st.write("•", q)
-# ----------------------------
-# TIMER
-# ----------------------------
-st_autorefresh(interval=1000, key="timer")
-
-if st.session_state.time_left > 0:
-    st.session_state.time_left -= 1
-else:
-    st.warning("⏰ Time Up!")
-
-
-st.subheader("⏳ Time Remaining")
-st.info(f"{st.session_state.time_left} sec")
-# ----------------------------
-# QUESTION
-# ----------------------------
-if st.session_state.index >= len(role_questions):
-    st.session_state.index = 0
-
-question = role_questions[st.session_state.index]
-
-st.subheader("Question")
-st.info(question)
-# ----------------------------
-# VOICE INPUT
-# ----------------------------
-if st.button("🎙 Start Voice Input"):
-    text = speech_to_text()
-
-    if "Error" in text:
-        st.error(text)
-    else:
-        st.session_state.voice_text = text
-        st.success("Voice Captured")
-        st.rerun()
-
-
-answer = st.text_area(
-    "Your Answer",
-    value=st.session_state.voice_text,
-    height=150
+active_questions = (
+    st.session_state.generated_questions
+    if st.session_state.generated_questions is not None
+    else role_questions
 )
+if not st.session_state.interview_started:
+    st.stop()
 # ----------------------------
-# NEXT QUESTION
+# INTERVIEW
 # ----------------------------
-if st.button("Next Question"):
+if (
+    st.session_state.interview_started
+    and
+    st.session_state.index < len(active_questions)
+):
 
-    if answer.strip() == "":
-        st.warning("Write answer first")
-        st.stop()
+    question = active_questions[
+        st.session_state.index
+    ]
 
-    st.session_state.answers.append({
-        "question": question,
-        "answer": answer
-    })
+    # TIMER
+    remaining_time = max(
+        0,
+        60 - int(time.time() - st.session_state.start_time)
+    )
 
-    st.session_state.time_left = 60
-    st.session_state.voice_text = ""
+    st.subheader(
+        f"Question {st.session_state.index + 1}"
+    )
 
-    if st.session_state.index < len(role_questions) - 1:
-        st.session_state.index += 1
-        st.rerun()
-    else:
-        st.success("Interview Completed")
+    st.info(question)
+
+    st.subheader("⏳ Time Remaining")
+    st.warning(f"{remaining_time} seconds")
+
+    # ----------------------------
+    # VOICE INPUT
+    # ----------------------------
+    if st.button("🎙 Start Voice Input"):
+
+        with st.spinner("Listening..."):
+
+            text = speech_to_text()
+
+            if text.startswith("Error"):
+                st.error(text)
+
+            else:
+                st.session_state.voice_text = text
+                st.success(
+                    "Voice Captured Successfully"
+                )
+
+                st.rerun()
+
+    # ----------------------------
+    # ANSWER BOX
+    # ----------------------------
+    answer = st.text_area(
+        "Your Answer",
+        value=st.session_state.voice_text,
+        height=150
+    )
+
+    # ----------------------------
+    # TIME UP
+    # ----------------------------
+    if remaining_time == 0:
+
+        st.error("⏰ Time Up!")
+
+        if st.button("Skip Question"):
+
+            st.session_state.answers.append({
+                "question": question,
+                "answer": "Not Answered"
+            })
+
+            st.session_state.index += 1
+            st.session_state.start_time = time.time()
+            st.session_state.voice_text = ""
+
+            st.rerun()
+
+    # ----------------------------
+    # NEXT QUESTION
+    # ----------------------------
+    if st.button("Next Question"):
+
+        if answer.strip() == "":
+
+            st.warning(
+                "Please answer the question first"
+            )
+
+        else:
+
+            st.session_state.answers.append({
+                "question": question,
+                "answer": answer
+            })
+
+            st.session_state.index += 1
+            st.session_state.start_time = time.time()
+            st.session_state.voice_text = ""
+
+            st.rerun()
 # ----------------------------
-# FEEDBACK
+# INTERVIEW COMPLETE
 # ----------------------------
-if len(st.session_state.answers) > 0:
+else:
 
-    st.subheader("Interview Summary")
+    st.success("🎉 Interview Completed")
 
-    for i, item in enumerate(st.session_state.answers):
-
-        st.write(item["question"])
-        st.write(item["answer"])
-
-        if st.button(f"Get AI Feedback {i}", key=f"fb_{i}"):
-            st.session_state.feedback_index = i
-
-
-if st.session_state.feedback_index is not None:
-    item = st.session_state.answers[st.session_state.feedback_index]
-    feedback = get_feedback(item["question"], item["answer"])
-
-    st.subheader("AI Feedback")
-    st.write(feedback)
-# ----------------------------
-# ANALYSIS
-# ----------------------------
-percentage = 0
-scores = []
-total_ai_score = 0
-
-if len(st.session_state.answers) > 0:
-
-    st.subheader("📊 Analysis")
+    st.subheader("📋 Interview Summary")
 
     total_score = 0
-    total_keywords = 0
+    question_count = 0
 
     for item in st.session_state.answers:
 
-        q = item["question"]
-        a = item["answer"].lower()
+        st.write("Question:")
+        st.info(item["question"])
 
-        expected = keywords.get(q, [])
-        found = [k for k in expected if k.lower() in a]
+        st.write("Answer:")
+        st.write(item["answer"])
 
-        total_score += len(found)
-        total_keywords += len(expected)
-
-        score = (len(found) / len(expected) * 100) if expected else 0
-        scores.append(score)
-
-        ai_score = evaluate_answer(q, item["answer"])
-        total_ai_score += ai_score
-
-        st.write(q)
-        st.info(f"AI Score: {ai_score}%")
-
-    if total_keywords > 0:
-        percentage = round((total_score / total_keywords) * 100)
-
-        st.metric("Keyword Score", f"{percentage}%")
-
-        st.metric(
-            "AI Score",
-            f"{round(total_ai_score / len(st.session_state.answers))}%"
+        # Score each answer
+        answer_score = evaluate_answer(
+            item["question"],
+            item["answer"],
+            st.session_state.skills
         )
-# ----------------------------
-# HIRING DECISION
-# ----------------------------
-if len(st.session_state.answers) == len(role_questions):
 
-    st.subheader("🎯 Hiring Recommendation")
+        total_score += answer_score
+        question_count += 1
 
-    if percentage >= 80:
-        st.success("Recommended")
-    elif percentage >= 60:
-        st.warning("Average Candidate")
+    # Overall Score
+    overall_score = (
+        round(total_score / question_count)
+        if question_count > 0
+        else 0
+    )
+
+    st.subheader("📊 Overall Interview Score")
+    st.success(f"{overall_score}/100")
+
+    # Hiring Recommendation
+    if overall_score >= 80:
+        recommendation = "Strong Hire"
+
+    elif overall_score >= 60:
+        recommendation = "Hire"
+
+    elif overall_score >= 40:
+        recommendation = "Consider"
+
     else:
-        st.error("Not Recommended")
-# ----------------------------
-# GRAPH
-# ----------------------------
-if len(scores) > 0:
+        recommendation = "Reject"
 
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(y=scores, mode="lines+markers"))
+    st.subheader("💼 Hiring Recommendation")
+    st.info(recommendation)
 
-    st.plotly_chart(fig)
-# ----------------------------
-# PDF
-# ----------------------------
-if len(st.session_state.answers) > 0:
+    if st.button("📄 Generate Report"):
 
-    if st.button("Generate Report"):
+        file_path = generate_report(
+            st.session_state.answers,
+            overall_score,
+            recommendation
+        )
 
-        file = generate_report(st.session_state.answers, percentage)
+        with open(file_path, "rb") as pdf_file:
 
-        with open(file, "rb") as f:
             st.download_button(
-                "Download PDF",
-                f,
-                file_name="InterviewIQ_Report.pdf"
+                label="⬇ Download PDF",
+                data=pdf_file,
+                file_name="Interview_Report.pdf",
+                mime="application/pdf"
             )
 # ----------------------------
 # RESET
 # ----------------------------
-if st.button("Start New Interview"):
+if "skills" not in st.session_state:
+    st.session_state.skills = []
+    st.session_state.interview_started = False
+
+if st.button("🔄 Start New Interview"):
+
     st.session_state.index = 0
     st.session_state.answers = []
-    st.session_state.feedback_index = None
-    st.session_state.time_left = 60
+    st.session_state.generated_questions = None
+    st.session_state.start_time = time.time()
     st.session_state.voice_text = ""
+    st.session_state.skills = []
+
+    try:
+        st.cache_data.clear()
+    except:
+        pass
+
     st.rerun()
