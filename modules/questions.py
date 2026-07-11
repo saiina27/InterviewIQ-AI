@@ -1,40 +1,15 @@
-questions_data = {
-    "Python Developer": {
-        "Beginner": [
-            "What is Python?",
-            "What are lists in Python?",
-            "Difference between list and tuple?"
-        ],
-        "Intermediate": [
-            "Explain decorators.",
-            "What is multithreading?",
-            "Explain OOP concepts."
-        ],
-        "Advanced": [
-            "Explain GIL.",
-            "What are generators?",
-            "Explain memory management in Python."
-        ]
-    },
+def get_fallback_questions(skills):
 
-    "Web Developer": {
-        "Beginner": [
-            "What is HTML?",
-            "What is CSS?",
-            "What is JavaScript?"
-        ],
-        "Intermediate": [
-            "Explain DOM.",
-            "What is React?",
-            "What are APIs?"
-        ],
-        "Advanced": [
-            "Explain JWT.",
-            "Explain authentication vs authorization.",
-            "Explain REST APIs."
-        ]
-    }
-}
+    base = [
+        "Tell me about yourself",
+        "Explain your final year project",
+        "Why should we hire you?"
+    ]
 
-def load_questions():
-    return questions_data 
+    skill_based = []
+
+    for skill in skills:
+        skill_based.append(f"Explain your experience with {skill}")
+        skill_based.append(f"What challenges did you face with {skill}?")
+
+    return base + skill_based

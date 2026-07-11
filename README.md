@@ -68,31 +68,37 @@ An AI-powered Mock Interview Platform built using Python and Streamlit that help
 ## 📂 Project Structure
 
 ```
-InterviewIQ-AI/
+InterviewIQ/
 │
-├── app.py
-├── data/
-│   └── skills.json
+├── app.py                  # UI ONLY
+├── main.py                 # ORCHESTRATOR (brain)
 │
-├── modules/
-│   ├── ai_question_generator.py
-│   ├── ai_score.py
-│   ├── cheating_detector.py
-│   ├── pdf_report.py
-│   ├── questions.py
+├── core/
 │   ├── resume_parser.py
 │   ├── skill_detector.py
+│   ├── resume_match.py
+│   ├── scoring.py
+│   ├── question_engine.py   # MAIN QUESTION SYSTEM
+│
+├── ai/
+│   ├── gemini_client.py     # ONLY AI calls
+│
+├── fallback/
+│   ├── questions.py         # SAFE DEFAULT QUESTIONS
+│
+├── monitoring/
+│   ├── webcam.py
 │   ├── speech.py
 │   ├── timer.py
-│   └── webcam.py
+│   ├── cheating_detector.py
 │
-├── reports/
+├── reporting/
+│   ├── pdf_report.py
 │
-├── requirements.txt
-└── README.md
-```
-
----
+├── data/
+│   ├── skill.json
+│
+└── config.py
 
 ## 💡 Key Highlights
 
