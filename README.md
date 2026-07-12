@@ -1,122 +1,210 @@
-# 🎤 InterviewIQ AI
+# 🚀 InterviewIQ AI
 
-An AI-powered Mock Interview Platform built using Python and Streamlit that helps candidates prepare for technical interviews through resume analysis, AI-generated questions, answer evaluation, and hiring recommendations.
+An AI-powered mock interview platform that analyzes resumes, predicts suitable job roles, conducts technical interviews, monitors interview integrity using AI proctoring, and generates detailed performance reports.
+
+## 🌐 Live Demo
+
+* **Frontend:** https://interview-iq-ai-lyart.vercel.app
+* **Backend API:** https://interviewiq-ai-ctde.onrender.com
 
 ---
 
-## 🚀 Features
+## ✨ Features
 
 ### 📄 Resume Analysis
 
 * PDF Resume Upload
 * Resume Parsing
-* Automatic Skill Extraction
+* ATS Score Calculation
+* Skills Extraction
+* Missing Skills Detection
+* AI Resume Review
+* Resume Improvement Suggestions
+* Role Prediction
 
-### 🎥 Webcam Monitoring
+### 🎤 AI Interview
 
-* Real-time Webcam Integration using streamlit-webrtc
-* Candidate Activity Monitoring during Interviews
-* Supports Interview Proctoring Simulation
-* Foundation for Future Cheating Detection Features
+* AI Generated Interview Questions
+* Role-based Questions
+* Difficulty Levels
+* Answer Submission
+* Speech-to-Text Support
+* Automatic Interview Flow
 
-### 🤖 AI Interview Generation
+### 🛡️ AI Proctoring
 
-* AI-Generated Questions based on Resume
-* Skill-Based Technical Questions
-* Role-Based Interview Practice
+* Webcam Face Detection
+* No Face Detection
+* Multiple Face Detection
+* Tab Switching Detection
+* Cheating Event Logging
+* Automatic Interview Termination after Multiple Violations
 
-### 🎤 Interview Simulation
-- Speech-to-Text Answer Capture
-- Text-Based Answer Submission
-- Question-wise Timer
-- Webcam Monitoring
-- Real Interview Experience
+### 📊 Performance Report
 
-### 📊 Performance Evaluation
-
-* AI-Based Answer Evaluation
-* Overall Interview Score Calculation
-* Hiring Recommendation (Strong Hire / Hire / Consider / Reject)
-
-### 📑 Report Generation
-
-* Automated PDF Interview Report
-* Question & Answer Summary
-* Final Performance Score
-* Hiring Recommendation Summary
-
-### 🎥 Additional Features
-
-* Webcam Monitoring Integration
-* Streamlit Interactive User Interface
+* Question-wise Evaluation
+* Overall Score
+* Analytics Dashboard
+* Cheating Summary
+* PDF Report Download
 
 ---
 
-## 🧠 Tech Stack
+# 🏗️ Tech Stack
 
+### Frontend
+
+* React
+* Vite
+* Tailwind CSS
+* Axios
+* React Router
+
+### Backend
+
+* FastAPI
+* SQLAlchemy
 * Python
-* Streamlit
-* Gemini AI
-* SpeechRecognition
-* PyPDF2
-* ReportLab
+
+### Database
+
+* PostgreSQL
+* Neon PostgreSQL (Production)
+
+### AI
+
+* Google Gemini API
 * OpenCV
-* NLP & LLM-based Evaluation
+* Speech Recognition
+
+### Deployment
+
+* Vercel
+* Render
+* Docker
+* Docker Compose
 
 ---
 
-## 📂 Project Structure
+# 📁 Project Structure
 
 ```
-InterviewIQ/
+InterviewIQ-AI
 │
-├── app.py                  # UI ONLY
-├── main.py                 # ORCHESTRATOR (brain)
+├── backend
+│   ├── app
+│   ├── routers
+│   ├── services
+│   ├── models
+│   └── requirements.txt
 │
-├── core/
-│   ├── resume_parser.py
-│   ├── skill_detector.py
-│   ├── resume_match.py
-│   ├── scoring.py
-│   ├── question_engine.py   # MAIN QUESTION SYSTEM
+├── frontend
+│   ├── src
+│   ├── public
+│   └── package.json
 │
-├── ai/
-│   ├── gemini_client.py     # ONLY AI calls
-│
-├── fallback/
-│   ├── questions.py         # SAFE DEFAULT QUESTIONS
-│
-├── monitoring/
-│   ├── webcam.py
-│   ├── speech.py
-│   ├── timer.py
-│   ├── cheating_detector.py
-│
-├── reporting/
-│   ├── pdf_report.py
-│
-├── data/
-│   ├── skill.json
-│
-└── config.py
-
-## 💡 Key Highlights
-
-* AI-Powered Mock Interview System
-* Resume-Aware Question Generation
-* Speech-to-Text Integration
-* Automated Candidate Evaluation
-* Hiring Recommendation Engine
-* PDF Report Generation
-* End-to-End Interview Workflow
+├── docker-compose.yml
+├── README.md
+└── .env.example
+```
 
 ---
 
-## 👩‍💻 Developer
+# ⚙️ Local Installation
+
+## Clone Repository
+
+```bash
+git clone https://github.com/saiina27/InterviewIQ-AI.git
+cd InterviewIQ-AI
+```
+
+---
+
+## Backend
+
+```bash
+cd backend
+
+python -m venv venv
+
+source venv/bin/activate
+
+pip install -r requirements.txt
+
+uvicorn backend.app.main:app --reload
+```
+
+---
+
+## Frontend
+
+```bash
+cd frontend
+
+npm install
+
+npm run dev
+```
+
+---
+
+# 🐳 Docker
+
+Start the complete application using Docker Compose.
+
+```bash
+docker compose up --build
+```
+
+Services:
+
+* Frontend → http://localhost:5173
+* Backend → http://localhost:8000
+* PostgreSQL → localhost:5432
+
+---
+
+# 🔑 Environment Variables
+
+Create a `.env` file inside the backend.
+
+```env
+DATABASE_URL=your_database_url
+
+GEMINI_API_KEY=your_gemini_api_key
+```
+
+Create a `.env` file inside the frontend.
+
+```env
+VITE_API_URL=https://interviewiq-ai-ctde.onrender.com
+```
+
+---
+
+# 📈 Future Improvements
+
+* Gemini SDK Migration
+* Authentication
+* Interview History
+* HR Dashboard
+* Email Reports
+* Video Recording
+* Company-specific Interview Sets
+* LLM Evaluation Improvements
+
+---
+
+# 👩‍💻 Author
 
 **Saina Yadav**
 
-B.Tech (Computer Science Engineering)
-Amity University, Gurgaon
+* GitHub: https://github.com/saiina27
+* LinkedIn: Add your LinkedIn profile here.
 
-LinkedIn: https://www.linkedin.com/in/saina-yadav-6b0206354
+---
+
+## ⭐ Support
+
+If you found this project useful, consider giving it a ⭐ on GitHub.
