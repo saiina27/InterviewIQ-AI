@@ -191,7 +191,10 @@ function ResumeResult() {
         </h2>
 
         <p className="whitespace-pre-line leading-8 text-gray-700">
-          {data?.ai_resume_review}
+            {typeof data?.ai_resume_review === "string"
+              ? data.ai_resume_review
+              : data?.ai_resume_review?.error ||
+                "AI resume review is currently unavailable."}
         </p>
 
       </div>
