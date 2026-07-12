@@ -1,107 +1,175 @@
 # 🚀 InterviewIQ AI
 
-An AI-powered mock interview platform that analyzes resumes, predicts suitable job roles, conducts technical interviews, monitors interview integrity using AI proctoring, and generates detailed performance reports.
+<p align="center">
+  <b>AI-Powered Mock Interview Platform with Resume Intelligence, Automated Interviews, and AI Proctoring</b>
+</p>
 
-## 🌐 Live Demo
-
-* **Frontend:** https://interview-iq-ai-lyart.vercel.app
-* **Backend API:** https://interviewiq-ai-ctde.onrender.com
+<p align="center">
+  <a href="https://interview-iq-ai-lyart.vercel.app">Live Demo</a> •
+  <a href="https://interviewiq-ai-ctde.onrender.com">Backend API</a>
+</p>
 
 ---
 
-## ✨ Features
+## 📌 Overview
 
-### 📄 Resume Analysis
+InterviewIQ AI is an end-to-end AI-powered interview preparation platform that analyzes resumes, calculates ATS compatibility, predicts suitable job roles, generates personalized technical interviews, evaluates candidate responses, monitors interview integrity using AI proctoring, and generates detailed performance reports.
+
+The platform combines **Generative AI, Natural Language Processing, Speech Recognition, Computer Vision, and Full Stack Development** to simulate a real interview environment.
+
+---
+
+# ✨ Features
+
+## 📄 Resume Intelligence
 
 * PDF Resume Upload
-* Resume Parsing
-* ATS Score Calculation
+* Resume Text Extraction
+* ATS Compatibility Score
 * Skills Extraction
-* Missing Skills Detection
+* Missing Skills Identification
 * AI Resume Review
 * Resume Improvement Suggestions
-* Role Prediction
-
-### 🎤 AI Interview
-
-* AI Generated Interview Questions
-* Role-based Questions
-* Difficulty Levels
-* Answer Submission
-* Speech-to-Text Support
-* Automatic Interview Flow
-
-### 🛡️ AI Proctoring
-
-* Webcam Face Detection
-* No Face Detection
-* Multiple Face Detection
-* Tab Switching Detection
-* Cheating Event Logging
-* Automatic Interview Termination after Multiple Violations
-
-### 📊 Performance Report
-
-* Question-wise Evaluation
-* Overall Score
-* Analytics Dashboard
-* Cheating Summary
-* PDF Report Download
+* AI-based Role Prediction
 
 ---
 
-# 🏗️ Tech Stack
+## 🎤 AI Interview System
 
-### Frontend
+* Role-based Interview Generation
+* AI-generated Technical Questions
+* Difficulty-based Questions
+* Automated Interview Flow
+* Answer Submission
+* Speech-to-Text Support
+* AI Answer Evaluation
 
-* React
+---
+
+## 🛡️ AI Interview Proctoring
+
+* Real-time Webcam Monitoring
+* Face Detection
+* No Face Detection
+* Multiple Face Detection
+* Tab Switch Detection
+* Cheating Event Logging
+* Automatic Interview Termination After Multiple Violations
+
+---
+
+## 📊 Performance Analytics
+
+* Question-wise Evaluation
+* Overall Interview Score
+* Strength & Weakness Analysis
+* Cheating Activity Summary
+* Interactive Analytics Dashboard
+* PDF Performance Report Generation
+
+---
+
+# 🏗️ System Architecture
+
+![InterviewIQ Architecture](screenshots/architecture.png)
+
+Workflow:
+
+```
+Resume Upload
+      |
+      ↓
+Resume Parser
+      |
+      ↓
+ATS Analyzer + AI Review
+      |
+      ↓
+Role Prediction
+      |
+      ↓
+AI Interview Generator
+      |
+      ↓
+Interview Session
+      |
+      ├── Speech Recognition
+      ├── Face Detection
+      ├── Tab Monitoring
+      └── Answer Evaluation
+      |
+      ↓
+Analytics Dashboard
+      |
+      ↓
+PDF Report
+```
+
+---
+
+# 🛠️ Tech Stack
+
+## Frontend
+
+* React.js
 * Vite
 * Tailwind CSS
 * Axios
 * React Router
 
-### Backend
+## Backend
 
+* Python
 * FastAPI
 * SQLAlchemy
-* Python
 
-### Database
-
-* PostgreSQL
-* Neon PostgreSQL (Production)
-
-### AI
+## AI & ML
 
 * Google Gemini API
+* NLP
 * OpenCV
 * Speech Recognition
 
-### Deployment
+## Database
 
-* Vercel
-* Render
+* PostgreSQL
+* Neon PostgreSQL
+
+## Deployment & DevOps
+
 * Docker
 * Docker Compose
+* Vercel
+* Render
 
 ---
 
-# 📁 Project Structure
+# 📂 Project Structure
 
 ```
 InterviewIQ-AI
-│
+
 ├── backend
 │   ├── app
 │   ├── routers
 │   ├── services
-│   ├── models
-│   └── requirements.txt
+│   └── models
 │
 ├── frontend
 │   ├── src
-│   ├── public
-│   └── package.json
+│   └── public
+│
+├── ai
+├── modules
+├── reporting
+├── core
+├── data
+│
+├── docs
+│   ├── API.md
+│   ├── ARCHITECTURE.md
+│   ├── DATABASE.md
+│   └── DEPLOYMENT.md
 │
 ├── docker-compose.yml
 ├── README.md
@@ -116,12 +184,13 @@ InterviewIQ-AI
 
 ```bash
 git clone https://github.com/saiina27/InterviewIQ-AI.git
+
 cd InterviewIQ-AI
 ```
 
 ---
 
-## Backend
+# Backend Setup
 
 ```bash
 cd backend
@@ -137,7 +206,7 @@ uvicorn backend.app.main:app --reload
 
 ---
 
-## Frontend
+# Frontend Setup
 
 ```bash
 cd frontend
@@ -149,9 +218,9 @@ npm run dev
 
 ---
 
-# 🐳 Docker
+# 🐳 Docker Deployment
 
-Start the complete application using Docker Compose.
+Run the complete application:
 
 ```bash
 docker compose up --build
@@ -159,15 +228,19 @@ docker compose up --build
 
 Services:
 
-* Frontend → http://localhost:5173
-* Backend → http://localhost:8000
-* PostgreSQL → localhost:5432
+```
+Frontend  → localhost:5173
+
+Backend   → localhost:8000
+
+Database  → PostgreSQL
+```
 
 ---
 
-# 🔑 Environment Variables
+# 🔐 Environment Variables
 
-Create a `.env` file inside the backend.
+Backend:
 
 ```env
 DATABASE_URL=your_database_url
@@ -175,24 +248,47 @@ DATABASE_URL=your_database_url
 GEMINI_API_KEY=your_gemini_api_key
 ```
 
-Create a `.env` file inside the frontend.
+Frontend:
 
 ```env
-VITE_API_URL=https://interviewiq-ai-ctde.onrender.com
+VITE_API_URL=your_backend_url
 ```
 
 ---
 
-# 📈 Future Improvements
+# 📸 Screenshots
 
-* Gemini SDK Migration
-* Authentication
+Coming soon:
+
+* Dashboard
+* Resume Analysis
+* ATS Score
+* AI Interview
+* AI Proctoring
+* Analytics Report
+
+---
+
+# 📚 Documentation
+
+Detailed documentation:
+
+* API Documentation → `docs/API.md`
+* Architecture → `docs/ARCHITECTURE.md`
+* Database Design → `docs/DATABASE.md`
+* Deployment Guide → `docs/DEPLOYMENT.md`
+
+---
+
+# 🚀 Future Improvements
+
+* User Authentication
 * Interview History
 * HR Dashboard
-* Email Reports
-* Video Recording
-* Company-specific Interview Sets
-* LLM Evaluation Improvements
+* Company-specific Interview Preparation
+* Email Report Delivery
+* Video Interview Recording
+* Advanced LLM Evaluation
 
 ---
 
@@ -200,11 +296,12 @@ VITE_API_URL=https://interviewiq-ai-ctde.onrender.com
 
 **Saina Yadav**
 
-* GitHub: https://github.com/saiina27
-* LinkedIn: Add your LinkedIn profile here.
+GitHub:
+https://github.com/saiina27
+
+LinkedIn:
+Add your LinkedIn profile
 
 ---
 
-## ⭐ Support
-
-If you found this project useful, consider giving it a ⭐ on GitHub.
+⭐ If you found InterviewIQ AI useful, consider giving the repository a star.
