@@ -1,8 +1,8 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from .database import Base, engine
 from backend.app.routers import candidate, interview
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
     title="InterviewIQ API",
@@ -12,7 +12,8 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173"
+        "http://localhost:5173",
+        "https://interview-iq-ai-lyart.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
