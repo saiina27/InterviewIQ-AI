@@ -79,7 +79,7 @@ export default function Report() {
           <button
             onClick={() =>
               window.open(
-                `http://127.0.0.1:8000/interview/report/${interviewId}/pdf`,
+                `${import.meta.env.VITE_API_URL}/interview/report/${interviewId}/pdf`,
                 "_blank"
               )
             }

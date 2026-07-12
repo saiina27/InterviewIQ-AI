@@ -102,7 +102,7 @@ useEffect(() => {
                 try {
 
                     await axios.post(
-                        "http://127.0.0.1:8000/interview/cheating",
+                        `${import.meta.env.VITE_API_URL}/interview/cheating`,
                         {
                             interview_id: interviewId,
                             event_type: "Tab Switch",
@@ -140,7 +140,7 @@ useEffect(() => {
         try {
 
             const res = await axios.get(
-                `http://127.0.0.1:8000/interview/${interviewId}/questions`
+                `${import.meta.env.VITE_API_URL}/interview/${interviewId}/questions`
             );
 
             setQuestions(res.data.questions || []);
@@ -191,7 +191,7 @@ useEffect(() => {
         try {
 
             const res = await axios.post(
-                `http://127.0.0.1:8000/interview/detect-face?interview_id=${interviewId}`,
+                `${import.meta.env.VITE_API_URL}/interview/detect-face?interview_id=${interviewId}`,
                 formData,
                 {
                     headers: {
@@ -221,7 +221,7 @@ useEffect(() => {
     try {
 
         await axios.post(
-            "http://127.0.0.1:8000/interview/cheating",
+            `${import.meta.env.VITE_API_URL}/interview/cheating`,
             {
                 interview_id: interviewId,
                 event_type: "INTERVIEW_TERMINATED",
@@ -318,7 +318,7 @@ useEffect(() => {
         try {
 
             const res = await axios.post(
-                "http://127.0.0.1:8000/interview/answer",
+                `${import.meta.env.VITE_API_URL}/interview/answer`,
                 {
                     interview_id: interviewId,
                     question_id: currentQuestion.id,
