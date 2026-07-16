@@ -14,6 +14,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "https://interview-iq-ai-lyart.vercel.app",
+        "https://interview-iq-imw3gvvzs-saiina28.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
