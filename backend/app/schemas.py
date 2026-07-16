@@ -9,6 +9,10 @@ class CandidateCreate(BaseModel):
     resume_text: str
     detected_skills: str | None = None
 
+    predicted_role: str | None = None
+    resume_suggestions: str | None = None
+    ai_resume_review: str | None = None
+
 
 class CandidateResponse(BaseModel):
     id: int
@@ -23,6 +27,10 @@ class CandidateResponse(BaseModel):
     ats_score: int | None = None
     matched_skills: str | None = None
     missing_skills: str | None = None
+
+    predicted_role: str | None = None
+    resume_suggestions: str | None = None
+    ai_resume_review: str | None = None
 
     created_at: datetime
 
@@ -55,3 +63,37 @@ class CheatingEventCreate(BaseModel):
     interview_id: int
     event_type: str
     status: str
+
+class UserSignup(BaseModel):
+    full_name: str
+    email: EmailStr
+    password: str
+
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class UserResponse(BaseModel):
+    id: int
+    full_name: str
+    email: EmailStr
+
+    bio: str | None = None
+    profile_image: str | None = None
+
+    created_at: datetime
+
+    model_config = {
+        "from_attributes": True
+    }
+
+class UserUpdate(BaseModel):
+    full_name: str | None = None
+    bio: str | None = None
+    profile_image: str | None = None    
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str    

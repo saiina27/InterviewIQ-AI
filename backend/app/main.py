@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .database import Base, engine
-from backend.app.routers import candidate, interview
+from backend.app.routers import candidate, interview, auth
 
 app = FastAPI(
     title="InterviewIQ API",
@@ -24,6 +24,7 @@ Base.metadata.create_all(bind=engine)
 
 app.include_router(candidate.router)
 app.include_router(interview.router)
+app.include_router(auth.router)
 
 @app.get("/")
 def root():

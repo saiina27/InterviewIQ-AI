@@ -15,6 +15,7 @@ from backend.app.schemas import (
 )
 
 from backend.app.models import (
+    Candidate,
     Interview,
     InterviewAnswer,
     InterviewQuestion,
@@ -49,6 +50,10 @@ from backend.app.services.report_service import (
 from backend.app.services.pdf_report_service import (
     generate_interview_report_pdf,
 )
+
+from backend.app.crud import get_interviews_by_candidate
+from backend.app.security import get_current_user
+from backend.app.models import User
 
 router = APIRouter(
     prefix="/interview",
@@ -481,4 +486,57 @@ async def detect_face(
     return {
         "success": True,
         "status": "OK"
+    }
+
+@router.get("/history")
+def interview_history(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+
+    candidate = (
+        db.query(Candidate)
+        .filter(Candidate.email == current_user.email)
+        .first()
+    )
+
+    if not candidate:
+        return {
+            "success": True,
+            "history": []
+        }
+
+    interviews = get_interviews_by_candidate(
+        db,
+        candidate.id
+    )
+
+    history = []
+
+    for interview in interviews:
+
+        report = build_interview_report(db, interview.id)
+
+        history.append({
+            "id": interview.id,
+            "role": interview.role,
+            "difficulty": interview.difficulty,
+            "status": interview.status,
+            "created_at": interview.created_at,
+
+            "overall_score": report["statistics"]["overall_score"] if report else 0,
+            "average_score": report["statistics"]["average_score"] if report else 0,
+            "percentage": report["statistics"]["percentage"] if report else 0,
+
+            "total_questions": report["statistics"]["total_questions"] if report else 0,
+            "answered_questions": report["statistics"]["answered_questions"] if report else 0,
+
+            "cheating_events": report["integrity"]["total_events"] if report else 0,
+
+            "recommendation": report["hiring_recommendation"] if report else None
+        })
+
+    return {
+        "success": True,
+        "history": history
     }

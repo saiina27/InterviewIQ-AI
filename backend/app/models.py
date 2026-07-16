@@ -24,6 +24,12 @@ class Candidate(Base):
     matched_skills = Column(Text, nullable=True)
     missing_skills = Column(Text, nullable=True)
 
+    predicted_role = Column(String, nullable=True)
+
+    resume_suggestions = Column(Text, nullable=True)
+
+    ai_resume_review = Column(Text, nullable=True)
+
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     interviews = relationship(
@@ -154,3 +160,25 @@ class CheatingEvent(Base):
         "Interview",
         back_populates="cheating_events"
     )    
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    full_name = Column(String, nullable=False)
+
+    email = Column(String, unique=True, index=True, nullable=False)
+
+    hashed_password = Column(String, nullable=False)
+
+    # NEW
+    bio = Column(Text, nullable=True)
+
+    # NEW
+    profile_image = Column(String, nullable=True)
+
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now()
+    )

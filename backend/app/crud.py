@@ -4,6 +4,8 @@ from backend.app.models import Interview
 from backend.app.models import InterviewQuestion
 from backend.app.models import Candidate
 from backend.app.models import InterviewAnswer, CheatingEvent
+from backend.app.models import User
+from backend.app.security import hash_password, verify_password
 
 def create_interview(
     db: Session,
@@ -165,3 +167,79 @@ def save_cheating_event(
     db.refresh(event)
 
     return event
+
+def get_user_by_email(db: Session, email: str):
+    return (
+        db.query(User)
+        .filter(User.email == email)
+        .first()
+    )
+
+
+def create_user(
+    db: Session,
+    full_name: str,
+    email: str,
+    password: str
+):
+
+    existing = get_user_by_email(db, email)
+
+    if existing:
+        return None
+
+    user = User(
+        full_name=full_name,
+        email=email,
+        hashed_password=hash_password(password)
+    )
+
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    return user
+
+
+def authenticate_user(
+    db: Session,
+    email: str,
+    password: str
+):
+
+    user = get_user_by_email(db, email)
+
+    if not user:
+        return None
+
+    if not verify_password(password, user.hashed_password):
+        return None
+
+    return user
+
+def get_interviews_by_candidate(
+    db: Session,
+    candidate_id: int
+):
+    return (
+        db.query(Interview)
+        .filter(Interview.candidate_id == candidate_id)
+        .order_by(Interview.created_at.desc())
+        .all()
+    )
+
+def update_user(db, user, data):
+
+    if data.full_name is not None:
+        user.full_name = data.full_name
+
+    if data.bio is not None:
+        user.bio = data.bio
+
+    if data.profile_image is not None:
+        user.profile_image = data.profile_image
+
+    db.commit()
+    db.refresh(user)
+
+    return user
