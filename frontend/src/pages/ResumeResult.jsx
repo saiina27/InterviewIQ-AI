@@ -6,6 +6,7 @@ function ResumeResult() {
     const navigate = useNavigate();
 
     const data = location.state;
+    console.log(data);
 
     if (!data) {
         return (
@@ -93,7 +94,7 @@ function ResumeResult() {
           </p>
 
           <h2 className="text-2xl font-bold mt-4">
-            {data?.candidate?.name || "Candidate"}
+             {data?.candidate?.full_name || "Candidate"}
           </h2>
 
           <p className="text-gray-500">
@@ -168,17 +169,28 @@ function ResumeResult() {
 
           <div className="flex flex-wrap gap-3">
 
-            {(data?.ats_result?.missing_skills || []).map((skill, index) => (
-              <span  
-                key={index}
-                className="bg-red-100 text-red-600 px-4 py-2 rounded-full font-semibold"
-              >
-                {skill}
-              </span>
+  {data?.ats_result?.missing_skills?.length > 0 ? (
 
-            ))}
+    data.ats_result.missing_skills.map((skill, index) => (
 
-          </div>
+      <span
+        key={index}
+        className="bg-red-100 text-red-600 px-4 py-2 rounded-full font-semibold"
+      >
+        {skill}
+      </span>
+
+    ))
+
+  ) : (
+
+    <p className="text-green-600 font-semibold">
+      🎉 No missing skills detected.
+    </p>
+
+  )}
+
+</div>
 
         </div>
 

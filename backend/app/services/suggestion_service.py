@@ -74,4 +74,9 @@ def generate_resume_suggestions(resume_text: str, missing_skills: list):
             "Your resume looks short. Add more technical details."
         )
 
+    if not suggestions:
+      suggestions.append(
+        "Excellent resume! No major improvements were detected."
+    )
+
     return suggestions
