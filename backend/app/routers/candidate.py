@@ -151,7 +151,7 @@ async def upload_resume(
           "the AI service has reached its usage limit.\n\n"
           "Based on the ATS analysis, your resume appears to be strong. "
           "Please try again later for a detailed AI-generated review."
-      )
+       )
     # ----------------------------
     # Update existing candidate
     # ----------------------------
