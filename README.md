@@ -1,345 +1,359 @@
-# 🚀 InterviewIQ AI
+InterviewIQ AI
 
-![Python](https://img.shields.io/badge/Python-3.11-blue)
-![FastAPI](https://img.shields.io/badge/FastAPI-Framework-green)
-![React](https://img.shields.io/badge/React-Vite-61DAFB)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue)
-![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED)
-![License](https://img.shields.io/badge/License-MIT-yellow)
 
-An AI-powered mock interview platform that analyzes resumes, predicts suitable job roles, conducts AI-driven interviews, monitors interview integrity using AI proctoring, and generates detailed performance reports with analytics.
 
----
+An AI-powered mock interview platform that helps candidates prepare for technical interviews by combining intelligent resume analysis, ATS scoring, AI-powered resume feedback, role prediction, automated mock interviews, AI proctoring, and detailed performance analytics.
 
-# 🌐 Live Demo
+🌟 Why InterviewIQ AI?
 
-- **Frontend:** https://interview-iq-ai-lyart.vercel.app
-- **Backend API:** https://interviewiq-ai-ctde.onrender.com
+Preparing for technical interviews often requires multiple tools for resume review, ATS checking, interview practice, and performance tracking.
 
----
+InterviewIQ AI combines all these capabilities into one platform, allowing candidates to:
 
-# ✨ Features
+Analyze resumes with AI
 
-## 🔐 Authentication
+Improve ATS compatibility
 
-- JWT Authentication
-- User Signup & Login
-- Protected Routes
-- Persistent Login Sessions
-- User Profile Management
+Predict suitable job roles
 
----
+Practice AI-generated interviews
 
-## 📄 Resume Analysis
+Receive detailed AI feedback
 
-- PDF Resume Upload
-- Resume Parsing
-- ATS Score Calculation
-- Skills Extraction
-- Matched & Missing Skills Detection
-- AI Resume Review
-- Resume Improvement Suggestions
-- Job Role Prediction
+Monitor interview integrity using AI proctoring
 
----
+Download comprehensive interview reports
 
-## 🎤 AI Interview
+🌐 Live Demo
 
-- AI Generated Technical Questions
-- Role-based Interviews
-- Automatic Interview Flow
-- Answer Submission
-- Speech-to-Text Support
-- AI Answer Evaluation
+Frontend: https://interview-iq-ai-lyart.vercel.app
 
----
+Backend API: https://interviewiq-ai-ctde.onrender.com
 
-## 🛡️ AI Proctoring
+Swagger Docs: https://interviewiq-ai-ctde.onrender.com/docs
 
-- Webcam Face Detection
-- No Face Detection
-- Multiple Face Detection
-- Tab Switching Detection
-- Cheating Event Logging
-- Automatic Interview Termination after Multiple Violations
+✨ Key Highlights
 
----
+🤖 AI Resume Analysis
 
-## 📊 Dashboard
+📄 ATS Score Calculation
 
-- Personalized Dashboard
-- ATS Score Overview
-- Predicted Job Role
-- Matched Skills
-- Missing Skills
-- Resume Suggestions
-- AI Resume Review
-- Interview Performance Analytics
+🎯 Job Role Prediction
 
----
+💡 AI Resume Review
 
-## 📜 Interview History
+🎤 AI Mock Interviews
 
-- View Previous Interviews
-- Interview Scores
-- Completion Status
-- Report Access
+🧠 AI Answer Evaluation
 
----
+🛡️ AI Proctoring
 
-## 📑 Performance Reports
+📊 Performance Analytics
 
-- Question-wise Evaluation
-- Overall Interview Score
-- Percentage Calculation
-- Performance Analytics
-- Cheating Summary
-- PDF Report Download
+📑 PDF Report Generation
 
----
+⚡ Resume Analysis Cache
 
-# 🏗️ Tech Stack
+🔐 JWT Authentication
 
-## Frontend
+🐳 Dockerized Deployment
 
-- React
-- Vite
-- Tailwind CSS
-- React Router DOM
-- Axios
-- Context API
+🧠 AI Workflow
 
-## Backend
+Resume Upload
+      │
+      ▼
+PDF Parsing
+      │
+      ▼
+ATS Score
+      │
+      ▼
+Skill Extraction
+      │
+      ▼
+Role Prediction
+      │
+      ▼
+AI Resume Review
+      │
+      ▼
+Interview Generation
+      │
+      ▼
+Answer Evaluation
+      │
+      ▼
+Analytics & PDF Report
 
-- FastAPI
-- Python
-- SQLAlchemy
-- Pydantic
-- JWT Authentication
+🏗️ Architecture
 
-## Database
+React + Vite
+      │
+ REST API
+      │
+FastAPI
+      │
+SQLAlchemy ORM
+      │
+PostgreSQL
+      │
+Google Gemini API
 
-- PostgreSQL
-- Neon PostgreSQL
+🚀 Features
 
-## Artificial Intelligence
+Authentication
 
-- Google Gemini API
-- OpenCV
-- Speech Recognition
+JWT Authentication
 
-## Deployment
+Signup & Login
 
-- Vercel
-- Render
-- Docker
-- Docker Compose
+Protected APIs
 
----
+Persistent Sessions
 
-# 🏛️ Architecture
+User Profile
 
-```text
-               React + Vite
-                    │
-                    ▼
-            FastAPI REST APIs
-                    │
-                    ▼
-              SQLAlchemy ORM
-                    │
-                    ▼
-        PostgreSQL (Neon Database)
-                    │
-                    ▼
-             Google Gemini API
-```
+Resume Analysis
 
----
+PDF Upload
 
-# 📁 Project Structure
+Resume Parsing
 
-```text
-InterviewIQ-AI
-│
-├── backend
-│   ├── app
-│   │   ├── routers
-│   │   ├── services
-│   │   ├── models
-│   │   ├── schemas
-│   │   ├── security.py
+ATS Score
+
+Skill Extraction
+
+Missing Skills Detection
+
+Resume Suggestions
+
+AI Resume Review
+
+Role Prediction
+
+Resume Cache (SHA-256)
+
+AI Interview
+
+AI Question Generation
+
+Role-based Interviews
+
+Automatic Interview Flow
+
+Answer Submission
+
+AI Evaluation
+
+AI Proctoring
+
+Face Detection
+
+Multiple Face Detection
+
+No Face Detection
+
+Tab Switching Detection
+
+Cheating Logs
+
+Automatic Interview Termination
+
+Reports & Analytics
+
+Interview History
+
+Question-wise Evaluation
+
+Performance Analytics
+
+PDF Report Download
+
+🛠️ Tech Stack
+
+Layer
+
+Technology
+
+Frontend
+
+React, Vite, Tailwind CSS
+
+Backend
+
+FastAPI, Python
+
+ORM
+
+SQLAlchemy
+
+Database
+
+PostgreSQL, Neon
+
+AI
+
+Google Gemini
+
+Authentication
+
+JWT
+
+Proctoring
+
+OpenCV
+
+Reports
+
+ReportLab, Matplotlib
+
+Deployment
+
+Docker, Render, Vercel
+
+📂 Project Structure
+
+InterviewIQ-AI/
+├── backend/
+│   ├── app/
+│   │   ├── routers/
+│   │   ├── services/
+│   │   ├── models/
+│   │   ├── schemas/
+│   │   ├── config.py
 │   │   └── main.py
-│   └── requirements.txt
-│
-├── frontend
-│   ├── src
-│   │   ├── components
-│   │   ├── context
-│   │   ├── pages
-│   │   └── services
-│   └── package.json
-│
+│   ├── requirements.txt
+│   └── Dockerfile
+├── frontend/
 ├── docker-compose.yml
 ├── README.md
 └── .env.example
-```
 
----
+⚙️ Local Setup
 
-# ⚙️ Local Installation
-
-## 1️⃣ Clone Repository
-
-```bash
 git clone https://github.com/saiina27/InterviewIQ-AI.git
-
 cd InterviewIQ-AI
-```
 
----
+Backend
 
-## 2️⃣ Backend Setup
-
-```bash
 cd backend
-
 python -m venv venv
-
-source venv/bin/activate      # macOS/Linux
-
-# OR
-
-venv\Scripts\activate         # Windows
-
+source venv/bin/activate
 pip install -r requirements.txt
-
 uvicorn backend.app.main:app --reload
-```
 
-Backend runs on:
+Frontend
 
-```
-http://localhost:8000
-```
-
----
-
-## 3️⃣ Frontend Setup
-
-```bash
 cd frontend
-
 npm install
-
 npm run dev
-```
 
-Frontend runs on:
+🐳 Docker
 
-```
-http://localhost:5173
-```
+docker compose build
+docker compose up
 
----
+Stop:
 
-# 🐳 Docker
+docker compose down
 
-Run the complete application using Docker Compose.
+🔑 Environment Variables
 
-```bash
-docker compose up --build
-```
-
-Services:
-
-- Frontend → http://localhost:5173
-- Backend → http://localhost:8000
-- PostgreSQL → localhost:5432
-
----
-
-# 🔑 Environment Variables
-
-## Backend (.env)
-
-```env
-DATABASE_URL=your_database_url
-
-GEMINI_API_KEY=your_gemini_api_key
-
-SECRET_KEY=your_secret_key
-
+DATABASE_URL=
+GEMINI_API_KEY=
+SECRET_KEY=
 ALGORITHM=HS256
-
 ACCESS_TOKEN_EXPIRE_MINUTES=30
-```
 
----
+📖 API Endpoints
 
-## Frontend (.env)
+Module
 
-```env
-VITE_API_URL=https://interviewiq-ai-ctde.onrender.com
-```
+Endpoint
 
----
+Auth
 
-# 🔗 Main API Endpoints
+/auth/signup
 
-## Authentication
+Auth
 
-- POST `/auth/signup`
-- POST `/auth/login`
-- GET `/auth/me`
-- PUT `/auth/me`
+/auth/login
 
----
+Resume
 
-## Candidate
+/candidates/upload-resume
 
-- POST `/candidates/upload-resume`
-- GET `/candidates/me`
+Resume
 
----
+/candidates/me
 
-## Interview
+Interview
 
-- POST `/interview/start`
-- GET `/interview/questions/{id}`
-- POST `/interview/answer`
-- GET `/interview/history`
-- GET `/interview/analytics/{id}`
-- GET `/interview/report/{id}`
-- GET `/interview/report/{id}/pdf`
+/interview/start
 
----
+Interview
 
-# 📈 Future Improvements
+/interview/questions/{id}
 
-- AI Voice Interviewer
-- Company-specific Interview Sets
-- Multi-language Interviews
-- Role-based Admin Dashboard
-- Email Notifications
-- Resume Version Management
-- Video Recording
-- Advanced LLM Evaluation
-- Leaderboard & Analytics
+Interview
 
----
+/interview/answer
 
-# 👩‍💻 Author
+Report
 
-**Saina Yadav**
+/interview/report/{id}
 
-- GitHub: https://github.com/saiina27
-- LinkedIn: *(Add your LinkedIn profile here)*
+Analytics
 
----
+/interview/analytics/{id}
 
-# ⭐ Support
+🚀 Production Features
 
-If you found this project useful, please consider giving it a **⭐ Star** on GitHub.
+Dockerized application
 
-It helps others discover the project and motivates further development.
+RESTful API architecture
+
+Resume analysis cache
+
+Modular FastAPI structure
+
+Environment-based configuration
+
+SQLAlchemy ORM
+
+JWT authentication
+
+AI-powered interview engine
+
+AI proctoring
+
+PDF reporting
+
+🛣️ Roadmap
+
+AI Voice Interviews
+
+Company-specific Interview Modes
+
+Multi-language Support
+
+Email Notifications
+
+Admin Dashboard
+
+Advanced LLM Evaluation
+
+👩‍💻 Author
+
+Saina Yadav
+
+GitHub: https://github.com/saiina27
+
+📄 License
+
+Licensed under the MIT License.
+
+⭐ Support
+
+If you found this project helpful, consider giving it a ⭐ on GitHub.
