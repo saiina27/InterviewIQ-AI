@@ -1,61 +1,89 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import api from "../services/api";
 
+
 const AuthContext = createContext();
+
 
 
 export function AuthProvider({ children }) {
 
+
     const [user, setUser] = useState(null);
+
     const [loading, setLoading] = useState(true);
+
 
 
     useEffect(() => {
 
-        async function loadUser() {
+
+        const loadUser = async () => {
+
 
             const token = localStorage.getItem("token");
 
 
-            if (!token) {
+            if(!token){
+
                 setLoading(false);
                 return;
+
             }
 
 
-            try {
+
+            try{
+
 
                 const res = await api.get("/auth/me");
 
                 setUser(res.data);
 
 
-            } catch (err) {
+            }
+            catch(error){
+
+
+                console.error(
+                    "Auth Error:",
+                    error
+                );
+
 
                 localStorage.removeItem("token");
 
                 setUser(null);
 
 
-            } finally {
+            }
+            finally{
 
                 setLoading(false);
 
             }
 
-        }
+
+        };
 
 
         loadUser();
+
 
     }, []);
 
 
 
-    const login = async ({ email, password }) => {
 
 
-        const formData = new URLSearchParams();
+    const login = async ({
+        email,
+        password
+    }) => {
+
+
+        const formData =
+            new URLSearchParams();
 
 
         formData.append(
@@ -71,34 +99,47 @@ export function AuthProvider({ children }) {
 
 
 
-        const res = await api.post(
-            "/auth/login",
-            formData,
-            {
-                headers: {
-                    "Content-Type":
-                    "application/x-www-form-urlencoded",
-                },
-            }
-        );
+        const response =
+            await api.post(
+                "/auth/login",
+                formData,
+                {
+                    headers:{
+                        "Content-Type":
+                        "application/x-www-form-urlencoded"
+                    }
+                }
+            );
+
+
+
+        const token =
+            response.data.access_token;
 
 
 
         localStorage.setItem(
             "token",
-            res.data.access_token
+            token
         );
 
 
 
-        const userRes = await api.get(
-            "/auth/me"
+        const userResponse =
+            await api.get("/auth/me");
+
+
+
+        setUser(
+            userResponse.data
         );
 
 
-        setUser(userRes.data);
+        return userResponse.data;
+
 
     };
+
 
 
 
@@ -110,31 +151,49 @@ export function AuthProvider({ children }) {
     }) => {
 
 
-        const res = await api.post(
-            "/auth/signup",
-            {
-                full_name,
-                email,
-                password,
-            }
+        const response =
+            await api.post(
+                "/auth/signup",
+                {
+                    full_name,
+                    email,
+                    password
+                }
+            );
+
+
+        return response.data;
+
+
+    };
+
+
+
+
+
+    const updateUser = (updatedUser)=>{
+
+        setUser(updatedUser);
+
+    };
+
+
+
+
+
+    const logout = ()=>{
+
+
+        localStorage.removeItem(
+            "token"
         );
 
 
-        return res.data;
-
-    };
-
-
-
-
-
-    const logout = () => {
-
-        localStorage.removeItem("token");
-
         setUser(null);
 
+
     };
+
 
 
 
@@ -146,10 +205,11 @@ export function AuthProvider({ children }) {
             value={{
                 user,
                 setUser,
+                updateUser,
                 login,
                 signup,
                 logout,
-                loading,
+                loading
             }}
 
         >
@@ -158,14 +218,18 @@ export function AuthProvider({ children }) {
 
         </AuthContext.Provider>
 
+
     );
+
 
 }
 
 
 
 
-export function useAuth() {
+
+
+export function useAuth(){
 
     return useContext(AuthContext);
 

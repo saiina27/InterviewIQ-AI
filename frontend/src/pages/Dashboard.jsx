@@ -4,6 +4,7 @@ import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
 
+
 export default function Dashboard() {
 
     const location = useLocation();
@@ -11,140 +12,305 @@ export default function Dashboard() {
 
     const { user } = useAuth();
 
-    const locationResume = location.state?.resumeData;
-    const locationInterviewId = location.state?.interviewId;
 
-    const [resumeData, setResumeData] = useState(locationResume);
-    const [interviewId, setInterviewId] = useState(locationInterviewId);
-    const [loading, setLoading] = useState(true);
+    const [resumeData, setResumeData] = useState(
+        location.state?.resumeData || null
+    );
+
+    const [interviewId, setInterviewId] = useState(
+        location.state?.interviewId || null
+    );
 
     const [analytics, setAnalytics] = useState(null);
+
+    const [loading, setLoading] = useState(true);
+
+    const [error, setError] = useState("");
+
+
+
+    // -----------------------------
+    // SAFE JSON PARSER
+    // -----------------------------
+
+    const parseJSON = (data) => {
+
+        if (!data) return null;
+
+        if (typeof data === "object") {
+            return data;
+        }
+
+        try {
+
+            return JSON.parse(data);
+
+        } catch {
+
+            return null;
+
+        }
+
+    };
+
+
+
+
+
+    // -----------------------------
+    // FETCH USER RESUME DATA
+    // -----------------------------
+
+    useEffect(() => {
+
+
+        const fetchDashboardData = async () => {
+
+
+            if (resumeData) {
+
+                setLoading(false);
+                return;
+
+            }
+
+
+
+            try {
+
+
+                const candidateResponse =
+                    await api.get("/candidates/me");
+
+
+
+                const candidate =
+                    candidateResponse.data.candidate;
+
+
+
+                if (candidate) {
+
+
+                    setResumeData({
+
+                        candidate,
+
+
+                        ats_result: {
+
+                            ats_score:
+                                candidate.ats_score || 0,
+
+
+                            matched_skills:
+                                candidate.matched_skills || [],
+
+
+                            missing_skills:
+                                candidate.missing_skills || []
+
+                        },
+
+
+                        role_prediction: {
+
+                            predicted_role:
+                                candidate.predicted_role ||
+                                "Not Available"
+
+                        },
+
+
+                        resume_suggestions:
+                            candidate.resume_suggestions || [],
+
+
+
+                        ai_resume_review:
+                            parseJSON(
+                                candidate.ai_resume_review
+                            )
+
+
+                    });
+
+
+
+                }
+
+
+
+
+                const historyResponse =
+                    await api.get("/interview/history");
+
+
+
+                if (
+                    historyResponse.data.history &&
+                    historyResponse.data.history.length > 0
+                ) {
+
+
+                    setInterviewId(
+                        historyResponse.data.history[0].id
+                    );
+
+
+                }
+
+
+
+
+            }
+
+            catch(err) {
+
+
+                console.error(
+                    "Dashboard Error:",
+                    err
+                );
+
+
+                setError(
+                    "Unable to load dashboard data."
+                );
+
+
+            }
+
+            finally {
+
+
+                setLoading(false);
+
+
+            }
+
+
+
+        };
+
+
+
+        fetchDashboardData();
+
+
+
+    }, []);
+
+
+
+
+
+
+
+    // -----------------------------
+    // FETCH INTERVIEW ANALYTICS
+    // -----------------------------
+
+
+    useEffect(() => {
+
+
+        if (!interviewId)
+            return;
+
+
+
+        const fetchAnalytics = async () => {
+
+
+            try {
+
+
+                const response =
+                    await api.get(
+                        `/interview/analytics/${interviewId}`
+                    );
+
+
+                setAnalytics(
+                    response.data.analysis
+                );
+
+
+
+            }
+
+            catch(err) {
+
+
+                console.error(
+                    "Analytics Error:",
+                    err
+                );
+
+
+            }
+
+
+        };
+
+
+
+        fetchAnalytics();
+
+
+
+    }, [interviewId]);
+
+
+
+
+
+
+
+    // -----------------------------
+    // DATA VARIABLES
+    // -----------------------------
+
 
     const atsScore =
         resumeData?.ats_result?.ats_score || 0;
 
+
+
     const matchedSkills =
         resumeData?.ats_result?.matched_skills || [];
+
+
 
     const missingSkills =
         resumeData?.ats_result?.missing_skills || [];
 
+
+
     const candidate =
         resumeData?.candidate || {};
 
+
+
     const role =
         resumeData?.role_prediction?.predicted_role ||
-        resumeData?.candidate?.predicted_role ||
+        candidate?.predicted_role ||
         "Not Available";
-        
-    useEffect(() => {
 
-    const fetchCandidate = async () => {
 
-    if (locationResume) {
-        setLoading(false);
-        return;
-    }
 
-    try {
 
-        const res = await api.get("/candidates/me");
 
-        console.log("Candidate API Response:", res.data);
 
-        if (res.data.candidate) {
 
-            setResumeData({
-                candidate: res.data.candidate,
+    // -----------------------------
+    // LOADING
+    // -----------------------------
 
-             ats_result: {
-                ats_score: res.data.candidate.ats_score,
-                matched_skills: res.data.candidate.matched_skills,
-                missing_skills: res.data.candidate.missing_skills,
-            },
 
-            role_prediction: {
-                predicted_role: res.data.candidate.predicted_role,
-            },
+    if (loading) {
 
-            resume_suggestions: res.data.candidate.resume_suggestions,
-
-            ai_resume_review: res.data.candidate.ai_resume_review,
-        });
-
-            const historyRes = await api.get("/interview/history");
-
-            if (historyRes.data.history.length > 0) {
-                setInterviewId(historyRes.data.history[0].id);
-            }
-
-        }
-
-    } catch (err) {
-
-        console.error(err);
-
-    } finally {
-
-        setLoading(false);
-
-    }
-
-};
-    fetchCandidate();
-
-}, []);
-
-    useEffect(() => {
-
-        if (!interviewId) return;
-
-        const fetchAnalytics = async () => {
-
-            try {
-
-                const res = await api.get(
-                    `/interview/analytics/${interviewId}`
-                );
-
-                setAnalytics(res.data.analysis);
-
-            } catch (err) {
-
-                console.error("Analytics Error:", err);
-
-            }
-
-        };
-
-        fetchAnalytics();
-
-    }, [interviewId]);
-
-    // ---------------------------------
-    // FIRST LOGIN (NO RESUME)
-    // ---------------------------------
-if (loading) {
-
-    return (
-
-        <>
-            <Navbar />
-
-            <div className="min-h-screen flex items-center justify-center">
-
-                <h2 className="text-2xl font-semibold">
-                    Loading Dashboard...
-                </h2>
-
-            </div>
-
-        </>
-
-    );
-
-}
-    if (!resumeData && !interviewId) {
 
         return (
 
@@ -152,103 +318,231 @@ if (loading) {
 
                 <Navbar />
 
-                <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 flex items-center justify-center px-6">
 
-                    <div className="max-w-3xl w-full bg-white rounded-3xl shadow-2xl p-10 text-center">
+                <div className="
+                    min-h-screen
+                    flex
+                    items-center
+                    justify-center
+                    bg-slate-100
+                ">
 
-                        <h1 className="text-5xl font-bold text-slate-800">
-                            Welcome {user?.full_name || "Candidate"} 👋
-                        </h1>
 
-                        <p className="mt-5 text-lg text-gray-600">
-                            Welcome to
-                            <span className="font-semibold text-indigo-600">
-                                {" "}InterviewIQ AI
-                            </span>.
-                            Upload your resume to unlock ATS analysis,
-                            AI resume review,
-                            role prediction,
-                            mock interviews,
-                            interview reports
-                            and detailed analytics.
-                        </p>
+                    <h2 className="
+                        text-3xl
+                        font-bold
+                        text-indigo-600
+                    ">
 
-                        <button
-                            onClick={() => navigate("/upload")}
-                            className="mt-10 bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-4 rounded-xl text-lg font-bold transition-all duration-300 hover:scale-105"
-                        >
-                            🚀 Upload Resume
-                        </button>
+                        Loading InterviewIQ AI...
 
-                        <div className="grid md:grid-cols-2 gap-6 mt-12">
+                    </h2>
 
-                            <div className="bg-indigo-50 rounded-2xl p-6">
-
-                                <h3 className="text-xl font-bold text-indigo-700">
-                                    📄 ATS Resume Analysis
-                                </h3>
-
-                                <p className="text-gray-600 mt-2">
-                                    Get ATS score, matched skills
-                                    and missing skills instantly.
-                                </p>
-
-                            </div>
-
-                            <div className="bg-green-50 rounded-2xl p-6">
-
-                                <h3 className="text-xl font-bold text-green-700">
-                                    🤖 AI Resume Review
-                                </h3>
-
-                                <p className="text-gray-600 mt-2">
-                                    Receive AI suggestions to improve
-                                    your resume.
-                                </p>
-
-                            </div>
-
-                            <div className="bg-blue-50 rounded-2xl p-6">
-
-                                <h3 className="text-xl font-bold text-blue-700">
-                                    🎤 AI Mock Interview
-                                </h3>
-
-                                <p className="text-gray-600 mt-2">
-                                    Practice role-based interview
-                                    questions with AI.
-                                </p>
-
-                            </div>
-
-                            <div className="bg-purple-50 rounded-2xl p-6">
-
-                                <h3 className="text-xl font-bold text-purple-700">
-                                    📊 Performance Analytics
-                                </h3>
-
-                                <p className="text-gray-600 mt-2">
-                                    Track interview performance
-                                    and monitor improvement.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                    </div>
 
                 </div>
+
 
             </>
 
         );
 
+
     }
 
-    // ---------------------------------
-    // DASHBOARD AFTER RESUME UPLOAD
-    // ---------------------------------
+
+
+
+
+    // -----------------------------
+    // ERROR
+    // -----------------------------
+
+
+    if (error) {
+
+
+        return (
+
+            <>
+
+                <Navbar />
+
+
+                <div className="
+                    min-h-screen
+                    flex
+                    items-center
+                    justify-center
+                ">
+
+
+                    <div className="
+                        bg-white
+                        shadow-xl
+                        rounded-3xl
+                        p-10
+                        text-center
+                    ">
+
+
+                        <h2 className="
+                            text-2xl
+                            font-bold
+                            text-red-600
+                        ">
+
+                            {error}
+
+                        </h2>
+
+
+
+                        <button
+
+                            onClick={() =>
+                                navigate("/upload")
+                            }
+
+                            className="
+                                mt-6
+                                bg-indigo-600
+                                text-white
+                                px-8
+                                py-3
+                                rounded-xl
+                                font-bold
+                            "
+
+                        >
+
+                            Upload Resume
+
+                        </button>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </>
+
+        );
+
+
+    }
+
+
+
+
+
+
+
+    // -----------------------------
+    // FIRST LOGIN EMPTY STATE
+    // -----------------------------
+
+
+    if (!resumeData && !interviewId) {
+
+
+        return (
+
+            <>
+
+                <Navbar />
+
+
+                <div className="
+                    min-h-screen
+                    bg-gradient-to-br
+                    from-slate-100
+                    via-blue-50
+                    to-indigo-100
+                    flex
+                    items-center
+                    justify-center
+                    p-6
+                ">
+
+
+                    <div className="
+                        bg-white
+                        rounded-3xl
+                        shadow-2xl
+                        p-10
+                        max-w-3xl
+                        text-center
+                    ">
+
+
+                        <h1 className="
+                            text-5xl
+                            font-bold
+                            text-slate-800
+                        ">
+
+                            Welcome {user?.full_name || "Candidate"} 👋
+
+                        </h1>
+
+
+
+                        <p className="
+                            mt-5
+                            text-gray-600
+                            text-lg
+                        ">
+
+
+                            Upload your resume to unlock
+                            ATS scoring, AI review,
+                            role prediction and AI interviews.
+
+
+                        </p>
+
+
+
+
+                        <button
+
+                            onClick={() =>
+                                navigate("/upload")
+                            }
+
+                            className="
+                                mt-8
+                                bg-indigo-600
+                                hover:bg-indigo-700
+                                text-white
+                                px-10
+                                py-4
+                                rounded-xl
+                                font-bold
+                            "
+
+                        >
+
+                            🚀 Upload Resume
+
+                        </button>
+
+
+
+                    </div>
+
+
+                </div>
+
+
+            </>
+
+        );
+
+
+    }
 
     return (
 
@@ -256,241 +550,952 @@ if (loading) {
 
             <Navbar />
 
-            <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 p-8">
 
-                <div className="max-w-7xl mx-auto">
-                    <div className="mb-10">
+            <div className="
+                min-h-screen
+                bg-gradient-to-br
+                from-slate-100
+                via-blue-50
+                to-indigo-100
+                p-8
+            ">
 
-    <h1 className="text-5xl font-bold text-slate-800">
-       Welcome {user?.full_name || candidate.full_name || "Candidate"} 🚀
-    </h1>
 
-    <p className="text-gray-500 mt-3">
-        AI powered resume analysis and interview intelligence dashboard
-    </p>
+                <div className="
+                    max-w-7xl
+                    mx-auto
+                ">
+
+
+
+                    {/* HEADER */}
+
+<div className="
+    mb-10
+    flex
+    flex-col
+    lg:flex-row
+    justify-between
+    gap-6
+">
+
+
+    <div>
+
+        <h1 className="
+            text-5xl
+            font-bold
+            text-slate-800
+        ">
+
+            Welcome back, {
+                user?.full_name ||
+                candidate.full_name ||
+                "Candidate"
+            } 🚀
+
+        </h1>
+
+
+        <p className="
+            mt-3
+            text-gray-500
+            text-lg
+        ">
+
+            Your AI career assistant is ready.
+            Analyze resumes, practice interviews,
+            and track hiring performance.
+
+        </p>
+
+
+    </div>
+
+
+
+
+    <div className="
+        bg-white
+        rounded-3xl
+        shadow-lg
+        p-6
+        min-w-[280px]
+    ">
+
+
+        <h3 className="
+            font-bold
+            text-xl
+            text-slate-800
+        ">
+
+            🤖 AI Career Assistant
+
+        </h3>
+
+
+        <div className="
+            mt-4
+            space-y-2
+            text-sm
+            text-gray-600
+        ">
+
+
+            <p>
+                ✅ Resume Analyzed
+            </p>
+
+
+            <p>
+                {
+                    interviewId
+                    ? "✅ Interview Completed"
+                    : "⏳ Interview Pending"
+                }
+            </p>
+
+
+            <p>
+                🎯 Role: {role}
+            </p>
+
+
+        </div>
+
+
+    </div>
+
 
 </div>
 
-{/* Top Cards */}
 
-<div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
 
-    <div className="bg-white rounded-2xl shadow-lg p-6">
-        <p className="text-gray-500">ATS Score</p>
-        <h2 className="text-5xl font-bold text-blue-600 mt-3">
-            {atsScore}%
-        </h2>
-    </div>
 
-    <div className="bg-white rounded-2xl shadow-lg p-6">
-        <p className="text-gray-500">Predicted Role</p>
-        <h2 className="text-2xl font-bold text-green-600 mt-5">
-            {role}
-        </h2>
-    </div>
 
-    <div className="bg-white rounded-2xl shadow-lg p-6">
-        <p className="text-gray-500">Skills Matched</p>
-        <h2 className="text-5xl font-bold text-purple-600 mt-3">
-            {matchedSkills.length}
-        </h2>
-    </div>
+                    {/* STATS */}
 
-    <div className="bg-white rounded-2xl shadow-lg p-6">
-        <p className="text-gray-500">Interview Status</p>
-        <h2 className="text-2xl font-bold text-indigo-600 mt-5">
-            {interviewId ? "Completed" : "Not Started"}
-        </h2>
-    </div>
 
-</div>
+                    <div className="
+                        grid
+                        md:grid-cols-2
+                        lg:grid-cols-4
+                        gap-6
+                    ">
 
-{/* Skills */}
 
-<div className="grid lg:grid-cols-2 gap-6 mt-8">
+                        <div className="
+                            bg-white
+                            rounded-3xl
+                            shadow-lg
+                            p-6
+                        ">
 
-    <div className="bg-white rounded-2xl shadow-lg p-8">
 
-        <h2 className="text-2xl font-bold mb-5">
-            Matched Skills
-        </h2>
+                            <p className="text-gray-500">
+                                📊 ATS Score
+                            </p>
 
-        <div className="flex flex-wrap gap-3">
 
-            {matchedSkills.length > 0 ? (
+                            <h2 className="
+                                text-5xl
+                                font-bold
+                                text-blue-600
+                                mt-4
+                            ">
 
-                matchedSkills.map((skill, index) => (
+                                {atsScore}%
 
-                    <span
-                        key={index}
-                        className="bg-green-100 text-green-700 px-4 py-2 rounded-full font-semibold"
-                    >
-                        {skill}
-                    </span>
+                            </h2>
+                            <div className="
+    mt-4
+    bg-gray-200
+    rounded-full
+    h-3
+">
 
-                ))
-
-            ) : (
-
-                <p>No skills found.</p>
-
-            )}
-
-        </div>
-
-    </div>
-
-    <div className="bg-white rounded-2xl shadow-lg p-8">
-
-        <h2 className="text-2xl font-bold mb-5">
-            Missing Skills
-        </h2>
-
-        <div className="flex flex-wrap gap-3">
-
-            {missingSkills.length > 0 ? (
-
-                missingSkills.map((skill, index) => (
-
-                    <span
-                        key={index}
-                        className="bg-red-100 text-red-600 px-4 py-2 rounded-full font-semibold"
-                    >
-                        {skill}
-                    </span>
-
-                ))
-
-            ) : (
-
-                <p>No missing skills.</p>
-
-            )}
-
-        </div>
+    <div
+        className="
+            bg-blue-600
+            h-3
+            rounded-full
+        "
+        style={{
+            width:`${atsScore}%`
+        }}
+    >
 
     </div>
 
 </div>
 
-{/* Interview Analytics */}
 
-<div className="bg-white rounded-2xl shadow-lg p-8 mt-8">
+                            <p className="mt-2 text-sm text-gray-500">
 
-    <h2 className="text-2xl font-bold mb-5">
-        Interview Performance
-    </h2>
+                                {
+                                    atsScore >= 85
+                                    ? "Excellent Resume"
+                                    : atsScore >= 70
+                                    ? "Good Resume"
+                                    : "Needs Improvement"
+                                }
 
-    <div className="grid md:grid-cols-3 gap-5">
+                            </p>
 
-        <div className="bg-slate-50 rounded-xl p-5">
-            <p>Total Questions</p>
 
-            <h3 className="text-3xl font-bold mt-2">
-                {analytics?.total_questions ?? "-"}
-            </h3>
-        </div>
+                        </div>
 
-        <div className="bg-green-50 rounded-xl p-5">
-            <p>Average Score</p>
 
-            <h3 className="text-3xl font-bold text-green-600 mt-2">
-                {analytics?.average_score ?? "-"}
-            </h3>
-        </div>
 
-        <div className="bg-blue-50 rounded-xl p-5">
-            <p>Percentage</p>
 
-            <h3 className="text-3xl font-bold text-blue-600 mt-2">
-                {analytics ? `${analytics.percentage}%` : "-"}
-            </h3>
-        </div>
 
-    </div>
+                        <div className="
+                            bg-white
+                            rounded-3xl
+                            shadow-lg
+                            p-6
+                        ">
 
-</div>
 
-{/* AI Resume Review */}
+                            <p className="text-gray-500">
+                                💼 Predicted Role
+                            </p>
 
-<div className="bg-white rounded-2xl shadow-lg p-8 mt-8">
 
-    <h2 className="text-2xl font-bold mb-5">
-        AI Resume Review
-    </h2>
+                            <h2 className="
+                                text-2xl
+                                font-bold
+                                text-green-600
+                                mt-5
+                            ">
 
-    <p className="text-gray-700 leading-8 whitespace-pre-line">
-    {
-        resumeData?.ai_resume_review ||
-        resumeData?.candidate?.ai_resume_review ||
-        "AI review not available"
-    }
+                                {role}
+
+                            </h2>
+                            <p className="
+    mt-3
+    text-sm
+    text-gray-500
+">
+
+    🔥 Strong role match based on your resume
+
 </p>
 
-</div>
 
-{/* Resume Suggestions */}
+                        </div>
 
-<div className="bg-white rounded-2xl shadow-lg p-8 mt-8">
 
-    <h2 className="text-2xl font-bold mb-5">
-        Resume Suggestions
-    </h2>
 
-    <div className="space-y-3">
 
-        {(resumeData?.resume_suggestions ||
-  resumeData?.candidate?.resume_suggestions) ? (
 
-    (resumeData.resume_suggestions ||
-     resumeData.candidate.resume_suggestions)
-        .split("\n")
-                .map((item, index) => (
+                        <div className="
+                            bg-white
+                            rounded-3xl
+                            shadow-lg
+                            p-6
+                        ">
 
-                    <p
-                        key={index}
-                        className="bg-yellow-50 border-l-4 border-yellow-500 p-3 rounded"
-                    >
-                        ✅ {item}
-                    </p>
 
-                ))
+                            <p className="text-gray-500">
+                                ⚡ Matched Skills
+                            </p>
 
-        ) : (
 
-            <p>No suggestions available.</p>
+                            <h2 className="
+                                text-5xl
+                                font-bold
+                                text-purple-600
+                                mt-4
+                            ">
 
-        )}
+                                {matchedSkills.length}
+
+                            </h2>
+
+
+                        </div>
+
+
+
+
+
+                        <div className="
+    bg-white
+    rounded-3xl
+    shadow-lg
+    p-6
+">
+
+
+    <div className="flex justify-between items-center">
+
+        <p className="text-gray-500">
+            🎤 Interview
+        </p>
+
+        <span className="text-2xl">
+            🚀
+        </span>
 
     </div>
 
+
+    <h2 className="
+        text-2xl
+        font-bold
+        text-indigo-600
+        mt-5
+    ">
+
+        {
+            interviewId
+            ? "Completed"
+            : "Not Started"
+        }
+
+    </h2>
+
+
+    <p className="text-sm text-gray-500 mt-2">
+
+        {
+            interviewId
+            ? "AI interview report available"
+            : "Start your AI mock interview"
+        }
+
+    </p>
+
+
+    {
+        interviewId && (
+
+            <button
+
+                onClick={() =>
+                    navigate(`/report/${interviewId}`)
+                }
+
+                className="
+                    mt-5
+                    bg-indigo-600
+                    hover:bg-indigo-700
+                    text-white
+                    px-5
+                    py-2
+                    rounded-xl
+                    font-semibold
+                    transition
+                "
+
+            >
+
+                View Report 📊
+
+            </button>
+
+        )
+    }
+
+
 </div>
 
-{/* Buttons */}
 
-<div className="flex flex-wrap gap-5 mt-10">
 
-    <button
-        onClick={() => navigate("/upload")}
-        className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold"
-    >
-        🚀 Start New Interview
-    </button>
+                    </div>
 
-    <button
-        onClick={() => navigate("/history")}
-        className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold"
-    >
-        📜 Interview History
-    </button>
 
-</div>
+
+
+
+
+
+                    {/* SKILLS */}
+
+
+                    <div className="
+                        grid
+                        lg:grid-cols-2
+                        gap-8
+                        mt-8
+                    ">
+
+
+                        <SkillCard
+                            title="✅ Matched Skills"
+                            skills={matchedSkills}
+                            type="green"
+                        />
+
+
+                        <SkillCard
+                            title="⚠ Missing Skills"
+                            skills={missingSkills}
+                            type="orange"
+                        />
+
+
+                    </div>
+
+
+
+
+
+
+
+
+
+                    {/* ANALYTICS */}
+
+
+                    <div className="
+                        bg-white
+                        rounded-3xl
+                        shadow-lg
+                        p-8
+                        mt-8
+                    ">
+
+
+                        <h2 className="
+                            text-3xl
+                            font-bold
+                            mb-6
+                        ">
+
+                            📊 Interview Performance
+
+                        </h2>
+
+
+
+                        <div className="
+                            grid
+                            md:grid-cols-3
+                            gap-6
+                        ">
+
+
+                            <AnalyticsCard
+                                title="Total Questions"
+                                value={
+                                    analytics?.total_questions ?? "-"
+                                }
+                            />
+
+
+                            <AnalyticsCard
+                                title="Average Score"
+                                value={
+                                    analytics?.average_score ?? "-"
+                                }
+                            />
+
+
+                            <AnalyticsCard
+                                title="Performance"
+                                value={
+                                    analytics
+                                    ? `${analytics.percentage}%`
+                                    : "-"
+                                }
+                            />
+
+
+                        </div>
+
+
+                    </div>
+
+
+
+
+
+
+
+
+                    {/* AI REVIEW */}
+
+
+
+                    <div className="
+                        bg-white
+                        rounded-3xl
+                        shadow-lg
+                        p-8
+                        mt-8
+                    ">
+
+
+                        <h2 className="
+                            text-3xl
+                            font-bold
+                            mb-6
+                        ">
+
+                            🤖 AI Resume Review
+
+                        </h2>
+
+
+
+                        {
+
+                            resumeData?.ai_resume_review ?
+
+
+                            <>
+
+
+                                <p className="
+                                    text-gray-700
+                                    leading-8
+                                ">
+
+                                    {
+                                        resumeData
+                                        .ai_resume_review
+                                        .summary
+                                    }
+
+
+                                </p>
+
+
+
+                                <div className="
+                                    grid
+                                    md:grid-cols-2
+                                    gap-6
+                                    mt-8
+                                ">
+
+
+                                    <div className="
+                                        bg-green-50
+                                        rounded-2xl
+                                        p-6
+                                    ">
+
+
+                                        <h3 className="
+                                            font-bold
+                                            text-green-700
+                                        ">
+
+                                            Strengths
+
+                                        </h3>
+
+
+
+                                        {
+                                            resumeData
+                                            .ai_resume_review
+                                            .strengths
+                                            ?.map(
+                                                (item,index)=>(
+                                                    <p
+                                                        key={index}
+                                                        className="mt-3"
+                                                    >
+                                                        ✓ {item}
+                                                    </p>
+                                                )
+                                            )
+                                        }
+
+
+
+                                    </div>
+
+
+
+
+
+                                    <div className="
+                                        bg-red-50
+                                        rounded-2xl
+                                        p-6
+                                    ">
+
+
+                                        <h3 className="
+                                            font-bold
+                                            text-red-700
+                                        ">
+
+                                            Weaknesses
+
+                                        </h3>
+
+
+
+                                        {
+                                            resumeData
+                                            .ai_resume_review
+                                            .weaknesses
+                                            ?.map(
+                                                (item,index)=>(
+                                                    <p
+                                                        key={index}
+                                                        className="mt-3"
+                                                    >
+                                                        ⚠ {item}
+                                                    </p>
+                                                )
+                                            )
+                                        }
+
+
+
+                                    </div>
+
+
+                                </div>
+
+
+
+
+
+                                <div className="
+                                    mt-6
+                                    bg-blue-50
+                                    rounded-2xl
+                                    p-6
+                                ">
+
+
+                                    <b>
+                                        Recruiter Recommendation
+                                    </b>
+
+
+                                    <p className="mt-2">
+
+                                        {
+                                            resumeData
+                                            .ai_resume_review
+                                            .recommendation
+                                        }
+
+                                    </p>
+
+
+                                    <p className="mt-3 font-bold">
+
+                                        ⭐ Rating:
+                                        {
+                                            resumeData
+                                            .ai_resume_review
+                                            .rating
+                                        }/10
+
+                                    </p>
+
+
+                                </div>
+
+
+                            </>
+
+
+                            :
+
+                            <p>
+                                AI review not available.
+                            </p>
+
+
+                        }
+
+
+                    </div>
+
+
+
+
+
+
+
+
+                    {/* SUGGESTIONS */}
+
+
+
+                    <div className="
+                        bg-white
+                        rounded-3xl
+                        shadow-lg
+                        p-8
+                        mt-8
+                    ">
+
+
+                        <h2 className="
+                            text-3xl
+                            font-bold
+                            mb-6
+                        ">
+
+                            📝 Resume Suggestions
+
+                        </h2>
+
+
+
+                        {
+
+                            Array.isArray(
+                                resumeData?.resume_suggestions
+                            )
+
+
+                            ?
+
+                            resumeData.resume_suggestions.map(
+                                (item,index)=>(
+                                    <p
+                                        key={index}
+                                        className="
+                                            bg-yellow-50
+                                            p-4
+                                            rounded-xl
+                                            mb-3
+                                        "
+                                    >
+
+                                        ✅ {item}
+
+                                    </p>
+                                )
+                            )
+
+
+                            :
+
+                            <p className="text-gray-500">
+
+                                No suggestions available.
+
+                            </p>
+
+
+                        }
+
+
+
+                    </div>
+
+
+
+
+
+
+
+
+
+                    {/* ACTIONS */}
+
+
+
+                    <div className="
+                        flex
+                        justify-center
+                        gap-6
+                        mt-10
+                    ">
+
+
+                        <button
+
+                            onClick={() =>
+                                navigate("/upload")
+                            }
+
+                            className="
+                                bg-indigo-600
+                                text-white
+                                px-10
+                                py-4
+                                rounded-2xl
+                                font-bold
+                            "
+
+                        >
+
+                            🚀 New Analysis
+
+                        </button>
+
+
+
+                        <button
+
+                            onClick={() =>
+                                navigate("/history")
+                            }
+
+                            className="
+                                border-2
+                                border-blue-600
+                                text-blue-600
+                                px-10
+                                py-4
+                                rounded-2xl
+                                font-bold
+                            "
+
+                        >
+
+                            📜 History
+
+                        </button>
+
+
+                    </div>
+
+
+
 
                 </div>
+
+
             </div>
+
 
         </>
 
     );
 
 }
+
+
+
+
+// -----------------------------
+// SMALL COMPONENTS
+// -----------------------------
+
+
+function SkillCard({title, skills}) {
+
+
+    return (
+
+        <div className="
+            bg-white
+            rounded-3xl
+            shadow-lg
+            p-8
+        ">
+
+
+            <h2 className="
+                text-2xl
+                font-bold
+                mb-5
+            ">
+
+                {title}
+
+            </h2>
+
+
+
+            <div className="
+                flex
+                flex-wrap
+                gap-3
+            ">
+
+
+                {
+
+                    skills.length
+
+                    ?
+
+                    skills.map(
+                        (skill,index)=>(
+
+                            <span
+                                key={index}
+                                className="
+                                    bg-indigo-100
+                                    text-indigo-700
+                                    px-4
+                                    py-2
+                                    rounded-full
+                                    font-semibold
+                                "
+                            >
+
+                                {skill}
+
+                            </span>
+
+                        )
+                    )
+
+
+                    :
+
+                    <p className="text-gray-500">
+                        None
+                    </p>
+
+
+                }
+
+
+            </div>
+
+
+        </div>
+
+
+    );
+
+}
+
+
+
+
+
+
+function AnalyticsCard({title,value}) {
+
+
+    return (
+
+        <div className="
+            bg-slate-50
+            rounded-2xl
+            p-6
+        ">
+
+
+            <p className="text-gray-500">
+                {title}
+            </p>
+
+
+            <h3 className="
+                text-4xl
+                font-bold
+                mt-3
+            ">
+
+                {value}
+
+            </h3>
+
+
+        </div>
+
+    );
+
+}    

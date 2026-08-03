@@ -1,8 +1,5 @@
-from backend.app.services.gemini_service import (
-    generate_content,
-    extract_json
-)
-
+from backend.app.ai.gemini_client import generate_content
+from backend.app.services.interview_service import extract_json
 # --------------------------------------------------
 # Basic Technical Keywords (Fallback Evaluation)
 # --------------------------------------------------

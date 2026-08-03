@@ -182,3 +182,38 @@ class User(Base):
         DateTime(timezone=True),
         server_default=func.now()
     )
+
+class ResumeAnalysisCache(Base):
+    __tablename__ = "resume_analysis_cache"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    resume_hash = Column(
+        String(64),
+        unique=True,
+        index=True,
+        nullable=False
+    )
+
+    prompt_version = Column(
+        Integer,
+        default=1,
+        nullable=False
+    )
+
+    ats_score = Column(Integer)
+
+    matched_skills = Column(Text)
+
+    missing_skills = Column(Text)
+
+    predicted_role = Column(String)
+
+    resume_suggestions = Column(Text)
+
+    ai_resume_review = Column(Text)
+
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now()
+    )

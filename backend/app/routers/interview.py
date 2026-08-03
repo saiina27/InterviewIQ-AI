@@ -30,10 +30,9 @@ from backend.app.crud import (
     save_cheating_event,
 )
 
-from backend.app.services.gemini_service import (
+from backend.app.services.interview_service import (
     generate_interview_questions,
 )
-
 from backend.app.services.answer_evaluation_service import (
     evaluate_answer,
 )

@@ -3,13 +3,11 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
 import fitz
+import json
 
 from ..database import get_db
 from .. import models, schemas
-from ..services.ats_scoring import calculate_ats_score
-from ..services.suggestion_service import generate_resume_suggestions
-from ..services.role_predictor import predict_job_role
-from ..services.ai_resume_review import ai_resume_review
+from ..services.resume_analysis_service import analyze_resume
 from backend.app.security import get_current_user
 from backend.app.models import User
 
@@ -28,7 +26,12 @@ def create_candidate(
     db: Session = Depends(get_db)
 ):
 
-    ats_result = calculate_ats_score(candidate.resume_text)
+    analysis = analyze_resume(
+    candidate.resume_text,
+    db
+)
+
+    ats_result = analysis["ats_result"]
 
     db_candidate = models.Candidate(
         full_name=candidate.full_name,
@@ -120,38 +123,16 @@ async def upload_resume(
     for page in doc:
         text += page.get_text()
 
-    # ATS Score
-    ats_result = calculate_ats_score(text)
+    analysis = analyze_resume(
+    text,
+    db
+)
 
-    # Resume Suggestions
-    suggestions = generate_resume_suggestions(
-        text,
-        ats_result["missing_skills"]
-    )
+    ats_result = analysis["ats_result"]
+    suggestions = analysis["resume_suggestions"]
+    role_result = analysis["role_prediction"]
+    ai_review = analysis["ai_resume_review"]
 
-    # Job Role Prediction
-    role_result = predict_job_role(text)
-
-    # AI Resume Review
-    try:
-        ai_review = ai_resume_review(text)
-
-    except Exception as e:
-       print(f"[AI Resume Review Error] {e}")
-
-       ai_review = (
-          "Resume Summary:\n\n"
-          "Your resume has been analyzed successfully.\n\n"
-          "Strengths:\n"
-          "• Good ATS score and relevant technical skills.\n"
-          "• Strong project experience.\n"
-          "• Resume structure appears well organized.\n\n"
-          "Recommendation:\n"
-          "The AI Resume Review service is temporarily unavailable because "
-          "the AI service has reached its usage limit.\n\n"
-          "Based on the ATS analysis, your resume appears to be strong. "
-          "Please try again later for a detailed AI-generated review."
-       )
     # ----------------------------
     # Update existing candidate
     # ----------------------------
@@ -171,7 +152,7 @@ async def upload_resume(
         existing.missing_skills = ",".join(ats_result["missing_skills"])
         existing.predicted_role = role_result["predicted_role"]
         existing.resume_suggestions = "\n".join(suggestions)
-        existing.ai_resume_review = ai_review
+        existing.ai_resume_review = json.dumps(ai_review)
 
         db.commit()
         db.refresh(existing)
@@ -198,7 +179,7 @@ async def upload_resume(
         missing_skills=",".join(ats_result["missing_skills"]),
         predicted_role=role_result["predicted_role"],
         resume_suggestions="\n".join(suggestions),
-        ai_resume_review=ai_review,
+        ai_resume_review=json.dumps(ai_review),
     )
 
     try:
