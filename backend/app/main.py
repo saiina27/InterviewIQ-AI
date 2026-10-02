@@ -13,6 +13,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
+        "http://localhost:5175",
         "https://interview-iq-ai-lyart.vercel.app",
         "https://interview-iq-imw3gvvzs-saiina28.vercel.app",
         "https://interview-iq-hv3wm5qux-saiina28.vercel.app",
