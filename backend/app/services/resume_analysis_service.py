@@ -3,9 +3,7 @@ from sqlalchemy.orm import Session
 from backend.app.logger import logger
 
 from .ats_scoring import calculate_ats_score
-from .suggestion_service import generate_resume_suggestions
-from .role_predictor import predict_job_role
-from .ai_resume_review import ai_resume_review
+from backend.app.ai.ai_resume_analyzer import analyze_resume_with_ai
 
 from .resume_cache_service import (
     generate_resume_hash,
@@ -18,7 +16,6 @@ def analyze_resume(
     text: str,
     db: Session
 ):
-
     # 1. Generate unique resume hash
     resume_hash = generate_resume_hash(text)
     logger.info(f"Resume Hash: {resume_hash}")
@@ -34,37 +31,116 @@ def analyze_resume(
 
     logger.info("[AI] Cache miss. Starting resume analysis.")
 
-    # ----------------------------
-    # Normal AI pipeline
-    # ----------------------------
-
-    ats_result = calculate_ats_score(text)
-
-    suggestions = generate_resume_suggestions(
-        text,
-        ats_result["missing_skills"]
-    )
-
-    role_result = predict_job_role(text)
+    # -------------------------------------------------
+    # AI-powered resume analysis
+    # -------------------------------------------------
 
     try:
-        ai_review = ai_resume_review(text)
+        ai_analysis = analyze_resume_with_ai(text)
 
     except Exception:
 
         logger.exception(
-            "AI Resume Review failed. Using fallback response."
+            "AI Resume Analyzer failed."
         )
 
-        ai_review = (
-            "AI service temporarily unavailable."
+        return {
+            "ats_result": {
+                "ats_score": 0,
+                "breakdown": {
+                    "skills": 0,
+                    "projects": 0,
+                    "experience": 0,
+                    "education": 0,
+                    "keywords": 0
+                },
+                "matched_skills": [],
+                "missing_skills": []
+            },
+
+            "resume_suggestions": [],
+
+            "role_prediction": {
+                "predicted_role": "Unable to determine",
+                "domain": "Unknown"
+            },
+
+            "ai_resume_review": {
+                "summary": "AI resume analysis is temporarily unavailable.",
+                "strengths": [],
+                "weaknesses": [],
+                "rating": 0,
+                "resume_suggestions": []
+            }
+        }
+
+    # -------------------------------------------------
+    # AI-driven ATS score
+    # -------------------------------------------------
+
+    ats_result = calculate_ats_score(
+        text,
+        ai_analysis
+    )
+
+    # -------------------------------------------------
+    # Role information
+    # -------------------------------------------------
+
+    role_result = {
+        "predicted_role": ai_analysis.get(
+            "role",
+            "Unknown"
+        ),
+        "domain": ai_analysis.get(
+            "domain",
+            "Unknown"
         )
+    }
+
+    # -------------------------------------------------
+    # AI Hiring Manager Review
+    # -------------------------------------------------
+
+    ai_review = {
+        "summary": ai_analysis.get(
+            "overview",
+            ""
+        ),
+
+        "strengths": ai_analysis.get(
+            "strengths",
+            []
+        ),
+
+        "weaknesses": ai_analysis.get(
+            "weaknesses",
+            []
+        ),
+
+        "rating": ai_analysis.get(
+            "rating",
+            0
+        ),
+
+        "resume_suggestions": ai_analysis.get(
+            "resume_suggestions",
+            []
+        )
+    }
+
+    # -------------------------------------------------
+    # Final response
+    # -------------------------------------------------
 
     analysis_result = {
 
         "ats_result": ats_result,
 
-        "resume_suggestions": suggestions,
+        "resume_suggestions": ai_analysis.get(
+            "resume_suggestions",
+            []
+        ),
 
         "role_prediction": role_result,
 
@@ -79,6 +155,8 @@ def analyze_resume(
         analysis_result
     )
 
-    logger.info("[AI] Resume analysis completed successfully.")
+    logger.info(
+        "[AI] Resume analysis completed successfully."
+    )
 
     return analysis_result

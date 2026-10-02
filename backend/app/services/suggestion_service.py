@@ -1,82 +1,96 @@
-def generate_resume_suggestions(resume_text: str, missing_skills: list):
+def generate_resume_suggestions(
+    resume_text: str,
+    missing_skills: list,
+    predicted_role: str = ""
+):
 
     text = resume_text.lower()
-
     suggestions = []
 
-    # -------------------------
-    # Missing Skills
-    # -------------------------
+    # ---------------------------------------------------------
+    # Role-specific technical gaps
+    # ---------------------------------------------------------
 
     if missing_skills:
         suggestions.append(
-            "Add these important skills: " +
-            ", ".join(missing_skills)
+            f"For a {predicted_role} role, consider strengthening: "
+            + ", ".join(missing_skills[:5])
+            + "."
         )
 
-    # -------------------------
+    # ---------------------------------------------------------
     # GitHub
-    # -------------------------
+    # ---------------------------------------------------------
 
     if "github" not in text:
         suggestions.append(
-            "Add your GitHub profile."
+            "Add your GitHub profile so recruiters can review your technical work."
         )
 
-    # -------------------------
+    # ---------------------------------------------------------
     # LinkedIn
-    # -------------------------
+    # ---------------------------------------------------------
 
     if "linkedin" not in text:
         suggestions.append(
-            "Add your LinkedIn profile."
+            "Add your LinkedIn profile to make your professional profile easier to verify."
         )
 
-    # -------------------------
+    # ---------------------------------------------------------
     # Projects
-    # -------------------------
+    # ---------------------------------------------------------
 
-    if "project" not in text:
+    project_markers = [
+        "technical projects",
+        "projects",
+        "project",
+        "built and deployed",
+        "developed",
+    ]
+
+    project_count = text.count("project")
+
+    if not any(marker in text for marker in project_markers) or project_count < 2:
         suggestions.append(
-            "Include at least 2 strong projects."
+            "Include strong projects with technologies, responsibilities, and measurable outcomes."
         )
 
-    # -------------------------
-    # Internship
-    # -------------------------
+    # ---------------------------------------------------------
+    # Internship / professional experience
+    # ---------------------------------------------------------
+
+    if "intern" not in text and "internship" not in text:
+        suggestions.append(
+            "If you have internship, freelance, open-source, or other practical experience, "
+            "add it with concrete responsibilities and outcomes."
+        )
+
+    # ---------------------------------------------------------
+    # Achievements / certifications
+    # ---------------------------------------------------------
 
     if (
-        "intern" not in text and
-        "internship" not in text
+        "achievement" not in text
+        and "award" not in text
+        and "certification" not in text
+        and "certifications" not in text
     ):
         suggestions.append(
-            "Mention internships or practical experience."
+            "Add relevant achievements, certifications, or measurable accomplishments."
         )
 
-    # -------------------------
-    # Achievements
-    # -------------------------
-
-    if (
-        "achievement" not in text and
-        "award" not in text
-    ):
-        suggestions.append(
-            "Include achievements or certifications."
-        )
-
-    # -------------------------
-    # Resume Length
-    # -------------------------
+    # ---------------------------------------------------------
+    # Resume length
+    # ---------------------------------------------------------
 
     if len(text) < 1500:
         suggestions.append(
-            "Your resume looks short. Add more technical details."
+            "Add more technical detail to project bullets where it improves clarity or demonstrates impact."
         )
 
     if not suggestions:
-      suggestions.append(
-        "Excellent resume! No major improvements were detected."
-    )
+        suggestions.append(
+            "No major resume improvements were detected for the predicted role."
+        )
 
-    return suggestions
+    return suggestions[:5]

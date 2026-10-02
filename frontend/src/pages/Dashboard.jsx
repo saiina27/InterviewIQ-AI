@@ -123,7 +123,13 @@ export default function Dashboard() {
 
 
                         resume_suggestions:
-                            candidate.resume_suggestions || [],
+                            Array.isArray(candidate.resume_suggestions)
+                                ? candidate.resume_suggestions
+                                : (
+                                    parseJSON(candidate.resume_suggestions) ||
+                                    parseJSON(candidate.ai_resume_review)?.resume_suggestions ||
+                                    []
+                                ),
 
 
 
@@ -1472,7 +1478,7 @@ export default function Dashboard() {
 
 
                                     <b>
-                                        Recruiter Recommendation
+                                        Hiring Manager Rating
                                     </b>
 
 

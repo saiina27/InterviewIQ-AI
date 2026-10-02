@@ -432,7 +432,7 @@ function ResumeResult() {
 
 
             <h3 className="font-bold mb-2">
-              Recruiter Recommendation
+              Hiring Manager Rating
             </h3>
 
 

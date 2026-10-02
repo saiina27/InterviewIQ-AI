@@ -1,189 +1,248 @@
-import re
+def calculate_ats_score(
+    resume_text: str,
+    ai_analysis: dict | None = None
+):
+    """
+    Calculate an explainable ATS-style score using AI-generated
+    role and skill intelligence.
 
+    The score evaluates:
+    - relevant skill coverage
+    - professional + practical experience
+    - project evidence
+    - education / qualifications
+    - resume completeness
 
-# -----------------------------
-# Required Skills
-# -----------------------------
-REQUIRED_SKILLS = [
-    "python",
-    "fastapi",
-    "sql",
-    "postgresql",
-    "api",
-    "git",
-    "docker",
-    "numpy",
-    "pandas"
-]
+    The scoring is deterministic; AI provides the role-specific
+    resume intelligence.
+    """
 
+    text = resume_text.lower()
+    ai_analysis = ai_analysis or {}
 
-# -----------------------------
-# Skill Score (30 Marks)
-# -----------------------------
-def calculate_skill_score(text):
-    matched_skills = []
+    matched_skills = ai_analysis.get("skills_match", [])
+    missing_skills = ai_analysis.get("missing_skills", [])
+    relevant_skills = ai_analysis.get("relevant_skills", [])
 
-    for skill in REQUIRED_SKILLS:
-        if skill in text:
-            matched_skills.append(skill)
+    # -------------------------------------------------
+    # 1. Relevant skill coverage — 40 points
+    # -------------------------------------------------
 
-    score = int((len(matched_skills) / len(REQUIRED_SKILLS)) * 30)
+    if relevant_skills:
+        matched_count = len(matched_skills)
 
-    missing_skills = list(set(REQUIRED_SKILLS) - set(matched_skills))
+        skill_coverage = (
+            matched_count / len(relevant_skills)
+        )
 
-    return score, matched_skills, missing_skills
+        skill_score = round(
+            skill_coverage * 40
+        )
+    else:
+        total_skills = (
+            len(matched_skills)
+            + len(missing_skills)
+        )
 
+        if total_skills:
+            skill_score = round(
+                (len(matched_skills) / total_skills) * 40
+            )
+        else:
+            skill_score = 0
 
-# -----------------------------
-# Project Score (20 Marks)
-# -----------------------------
-def calculate_project_score(text):
-    project_keywords = [
-        "project",
-        "github",
-        "developed",
-        "built",
-        "application"
+    # -------------------------------------------------
+    # 2. Experience & practical evidence — 20 points
+    #
+    # Professional experience: up to 12
+    # Practical/project evidence: up to 8
+    # -------------------------------------------------
+
+    professional_indicators = [
+        "work experience",
+        "professional experience",
+        "employment",
+        "internship",
+        "internships",
+        "intern ",
+        "freelance",
+        "freelancer",
+        "contract work",
+        "contractor",
+        "consultant",
+        "consulting",
     ]
 
-    count = 0
+    professional_evidence = sum(
+        text.count(keyword)
+        for keyword in professional_indicators
+    )
 
-    for word in project_keywords:
-        if word in text:
-            count += 1
-
-    if count == 0:
-        score = 0
-    elif count == 1:
-        score = 8
-    elif count == 2:
-        score = 14
+    if professional_evidence >= 4:
+        professional_score = 12
+    elif professional_evidence >= 2:
+        professional_score = 10
+    elif professional_evidence >= 1:
+        professional_score = 8
     else:
-        score = 20
+        professional_score = 0
 
-    return score
+    practical_indicators = [
+        "built",
+        "developed",
+        "designed",
+        "implemented",
+        "deployed",
+        "integrated",
+        "created",
+        "tested",
+        "architected",
+    ]
 
+    practical_evidence = sum(
+        text.count(keyword)
+        for keyword in practical_indicators
+    )
 
-# -----------------------------
-# Experience Score (20 Marks)
-# -----------------------------
-def calculate_experience_score(text):
+    if practical_evidence >= 8:
+        practical_score = 8
+    elif practical_evidence >= 5:
+        practical_score = 7
+    elif practical_evidence >= 3:
+        practical_score = 5
+    elif practical_evidence >= 1:
+        practical_score = 3
+    else:
+        practical_score = 0
 
-    if "3 years" in text or "4 years" in text or "5 years" in text:
-        return 20
+    experience_score = min(
+        20,
+        professional_score + practical_score
+    )
 
-    elif (
-        "2 years" in text
-        or "1 year" in text
-        or "intern" in text
-        or "internship" in text
-        or "experience" in text
-    ):
-        return 15
+    # -------------------------------------------------
+    # 3. Projects / practical application — 15 points
+    # -------------------------------------------------
 
-    return 0
+    project_indicators = [
+        "project",
+        "projects",
+        "github",
+        "built",
+        "developed",
+        "implemented",
+        "deployed",
+    ]
 
+    project_evidence = sum(
+        text.count(keyword)
+        for keyword in project_indicators
+    )
 
-# -----------------------------
-# Education Score (10 Marks)
-# -----------------------------
-def calculate_education_score(text):
+    if project_evidence >= 8:
+        project_score = 15
+    elif project_evidence >= 5:
+        project_score = 13
+    elif project_evidence >= 3:
+        project_score = 10
+    elif project_evidence >= 1:
+        project_score = 6
+    else:
+        project_score = 0
 
-    education_keywords = [
+    # -------------------------------------------------
+    # 4. Education / qualifications — 10 points
+    # -------------------------------------------------
+
+    education_indicators = [
         "b.tech",
         "btech",
         "bachelor",
         "master",
         "m.tech",
         "mtech",
+        "degree",
+        "university",
         "college",
-        "university"
+        "certification",
+        "certifications",
     ]
 
-    for word in education_keywords:
-        if word in text:
-            return 10
+    education_evidence = sum(
+        text.count(keyword)
+        for keyword in education_indicators
+    )
 
-    return 0
+    if education_evidence >= 3:
+        education_score = 10
+    elif education_evidence >= 2:
+        education_score = 9
+    elif education_evidence >= 1:
+        education_score = 7
+    else:
+        education_score = 0
 
+    # -------------------------------------------------
+    # 5. Resume completeness — 15 points
+    # -------------------------------------------------
 
-# -----------------------------
-# Keyword Score (20 Marks)
-# -----------------------------
-def calculate_keyword_score(text):
-
-    keywords = [
-        "python",
-        "api",
-        "sql",
-        "database",
-        "backend",
-        "machine learning",
-        "docker",
-        "git",
-        "fastapi",
-        "postgresql"
+    sections = [
+        "professional summary",
+        "summary",
+        "technical skills",
+        "skills",
+        "professional experience",
+        "experience",
+        "technical projects",
+        "projects",
+        "education",
+        "certifications",
     ]
 
-    matched = 0
+    section_evidence = sum(
+        section in text
+        for section in sections
+    )
 
-    for word in keywords:
-        if word in text:
-            matched += 1
+    if section_evidence >= 7:
+        completeness_score = 15
+    elif section_evidence >= 5:
+        completeness_score = 13
+    elif section_evidence >= 3:
+        completeness_score = 10
+    elif section_evidence >= 2:
+        completeness_score = 7
+    else:
+        completeness_score = 3
 
-    score = int((matched / len(keywords)) * 20)
-
-    return score
-
-
-# -----------------------------
-# Main ATS Score Function
-# -----------------------------
-def calculate_ats_score(resume_text: str):
-
-    text = resume_text.lower()
-
-    skill_score, matched_skills, missing_skills = calculate_skill_score(text)
-
-    project_score = calculate_project_score(text)
-
-    experience_score = calculate_experience_score(text)
-
-    education_score = calculate_education_score(text)
-
-    keyword_score = calculate_keyword_score(text)
+    # -------------------------------------------------
+    # Final score
+    # -------------------------------------------------
 
     overall_score = (
         skill_score
-        + project_score
         + experience_score
+        + project_score
         + education_score
-        + keyword_score
+        + completeness_score
     )
 
-    if overall_score > 100:
-        overall_score = 100
+    overall_score = max(
+        0,
+        min(100, overall_score)
+    )
 
     return {
-
         "ats_score": overall_score,
 
         "breakdown": {
-
             "skills": skill_score,
-
             "projects": project_score,
-
             "experience": experience_score,
-
             "education": education_score,
-
-            "keywords": keyword_score
-
+            "keywords": completeness_score,
         },
 
         "matched_skills": matched_skills,
-
-        "missing_skills": missing_skills
-
+        "missing_skills": missing_skills,
     }

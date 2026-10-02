@@ -38,3 +38,5 @@ reports/*
 build/
 dist/
 *.egg-info/
+.vercel
+.env*

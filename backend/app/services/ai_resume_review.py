@@ -45,6 +45,14 @@ Rules:
 - Recommendation should be one short sentence.
 - Rating must be a number between 1 and 10.
 - Give exactly 5 resume suggestions.
+- Suggestions must be specific to the actual resume.
+- Do NOT invent missing experience, skills, metrics, projects, or qualifications.
+- Do NOT recommend changing a degree/status statement when the resume already clearly
+  communicates the degree and graduation year.
+- Only flag education wording if it is genuinely ambiguous or internally inconsistent.
+- Do NOT give generic suggestions simply to fill the five suggestion slots.
+- Prefer actionable improvements involving technical depth, measurable impact,
+  project clarity, keywords, structure, or role relevance.
 
 Resume:
 
