@@ -1,4 +1,4 @@
-from backend.app.ai.gemini_client import generate_content
+from backend.app.ai.groq_client import generate_content
 from backend.app.services.interview_service import extract_json
 # --------------------------------------------------
 # Basic Technical Keywords (Fallback Evaluation)

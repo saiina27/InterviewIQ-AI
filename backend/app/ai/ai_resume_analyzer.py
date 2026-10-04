@@ -1,5 +1,6 @@
 from backend.app.ai.ai_gateway import ai_gateway
 from backend.app.ai.gemini_client import extract_json
+from datetime import date
 
 
 def analyze_resume_with_ai(resume_text: str):
@@ -9,6 +10,8 @@ def analyze_resume_with_ai(resume_text: str):
     The model infers the candidate's likely role/domain and produces
     evidence-based skills, gaps, strengths, weaknesses, and suggestions.
     """
+
+    current_date = date.today().isoformat()
 
     prompt = f"""
 You are an expert resume analyst, ATS specialist, and hiring manager.
@@ -26,8 +29,20 @@ CORE EVIDENCE RULES
 ==================================================
 
 1. Only treat a skill as demonstrated when the resume provides reasonable
-   evidence for it through skills, projects, work experience, education,
-   certifications, or other relevant sections.
+   evidence of actual use, application, or knowledge beyond merely listing
+   the skill.
+
+   A skill appearing only in a "Skills", "Core Skills", "Technical Skills",
+   "Technologies", or similar keyword list is considered MENTIONED, not
+   demonstrated.
+
+   A listed skill can be considered demonstrated when the resume also
+   provides supporting evidence such as actual use in work experience,
+   projects, research, coursework, certifications, or another concrete
+   context.
+
+   Do not treat a skill as demonstrated solely because it appears in a
+   skills/technologies list.
 
 2. A skill that is not mentioned or not sufficiently demonstrated should
    be considered "not demonstrated", NOT something the candidate definitely
@@ -47,27 +62,78 @@ CORE EVIDENCE RULES
    - technologies
    - achievements
 
-6. Do not reinterpret or "correct" facts that are clearly stated in the
+6. Preserve the factual meaning and strength of resume evidence.
+
+   You may paraphrase a resume statement for clarity, but do NOT strengthen,
+   extend, convert, or reinterpret it into a more specific claim than the
+   resume supports.
+
+   In particular:
+   - Preserve exact metrics and units when mentioning measurable outcomes.
+   - Do not convert one metric into a different metric or percentage.
+   - Do not turn a general activity into a stronger action such as "deployed",
+     "led", "architected", "managed", or "implemented" unless the resume
+     explicitly supports that action.
+   - Do not infer an outcome, impact, technology usage, responsibility, or
+     level of ownership that is not supported by the resume.
+   - If the resume says "worked on", do not automatically describe it as
+     "led" or "owned".
+   - If the resume says "developed" or "built", do not automatically add
+     deployment, production usage, scale, or business impact.
+   - If a claim is not explicitly supported, either omit it or describe only
+     the narrower fact that is supported.
+
+   Example:
+   Resume evidence: "saved 15 hours per week through automated reporting."
+   Valid: "Automated reporting that saved 15 hours per week."
+   Invalid: "Improved strategic planning speed by 30%."
+
+   Resume evidence: "developed predictive ML models."
+   Valid: "Developed predictive ML models."
+   Invalid: "Deployed predictive ML models."
+
+7. Do not reinterpret or "correct" facts that are clearly stated in the
    resume.
 
-7. In particular, do NOT flag graduation status, degree wording, dates,
-   or education as inconsistent unless the resume contains a genuine
-   contradiction between two statements.
+8. In particular, do NOT flag graduation status, degree wording, dates,
+   employment periods, or education as inconsistent unless the resume
+   contains a genuine contradiction between two statements.
 
-8. Do not create a weakness merely because the resume does not contain
+   Interpret employment dates using the current date provided below.
+
+   - A role with a start date in the past and an end date of "Present" is
+     a normal ongoing employment period.
+   - Do NOT describe a past start date as a "future start date".
+   - Do NOT flag "Present" as a timeline inconsistency.
+   - Only identify a future start date when the stated start date is actually
+     later than the current date.
+   - Do not invent a timeline error merely because a date looks unusual.
+
+   Current date: {current_date}
+
+9. Do not create a weakness merely because the resume does not contain
    something. A weakness should represent a meaningful limitation or gap
    relevant to the inferred role.
 
-9. Distinguish between:
-   - a skill being mentioned
-   - a skill being demonstrated through actual experience
-   - a skill being absent from the resume
+10. Distinguish explicitly between:
+   - a skill being mentioned only in a skills/technologies list
+   - a skill being demonstrated through concrete evidence elsewhere in the resume
+   - a skill being absent or not sufficiently demonstrated
 
-10. If the resume says the candidate built, implemented, deployed, tested,
-    integrated, or used something in a project, treat that as stronger
-    evidence than a skill appearing only in a skills list.
+   A skill mentioned only in a skills list must NOT be placed in
+   "skills_match" solely because it is listed there.
 
-11. Do NOT infer lack of professional or internship experience solely from
+11. If the resume says the candidate built, implemented, deployed, tested,
+    integrated, used, analyzed, configured, or otherwise applied something
+    in a project, work experience, research, coursework, certification, or
+    other concrete context, treat that as stronger evidence than a skill
+    appearing only in a skills list.
+
+    If a skill appears only in a skills list and there is no supporting
+    evidence of its use or application elsewhere, treat it as mentioned but
+    not sufficiently demonstrated.
+
+12. Do NOT infer lack of professional or internship experience solely from
     the graduation year, degree status, or the fact that the resume is
     project-focused.
 
@@ -85,10 +151,93 @@ CORE EVIDENCE RULES
 
     unless the resume explicitly supports that conclusion.
 
-12. Keep career and timeline recommendations temporally appropriate.
+
+12A. Do not turn generic industry expectations into candidate weaknesses.
+
+    A skill, tool, framework, platform, library, or methodology that is not
+    mentioned in the resume must NOT automatically be classified as missing,
+    weak, or recommended merely because it is common in the inferred
+    profession.
+
+    Only classify an unmentioned capability as a meaningful missing skill
+    when it is materially relevant to the inferred role, supported by the
+    role-specific skill framework, and the resume provides enough context
+    to justify identifying it as an evidence gap.
+
+    Do not invent specific technologies as missing requirements merely
+    because they are popular in the industry.
+
+    Do not automatically flag technologies such as Git, TensorFlow,
+    scikit-learn, SageMaker, Azure ML, or similar tools unless the actual
+    role/context and resume evidence make that specific capability
+    materially relevant.
+
+12B. Do not convert keyword absence into a weakness.
+
+    A weakness must describe a meaningful limitation, lack of evidence,
+    or area for improvement that is actually visible from the resume.
+
+    Do NOT create a weakness solely because:
+    - a common industry tool is absent,
+    - a keyword is not present,
+    - a technology is not listed,
+    - or a specific implementation detail is not named.
+
+    "Not sufficiently demonstrated" may be used for a materially relevant
+    capability, but absence alone must not automatically become a negative
+    weakness.
+
+12C. Keep recommendations evidence-grounded.
+
+    Do not recommend adding a technology, framework, platform, library,
+    certification, or tool merely to improve keyword matching.
+
+    Recommendations must be grounded in the candidate's actual experience,
+    demonstrated work, or a meaningful role-relevant evidence gap.
+
+    Never encourage the candidate to claim a technology or skill that the
+    resume does not establish they have actually used.
+
+12D. Prefer capability-level evidence gaps over technology-specific assumptions.
+
+    When the resume demonstrates a broader capability but does not identify
+    the specific tool, framework, platform, or methodology used, do NOT
+    automatically name a popular technology as the missing skill.
+
+    First identify the underlying role-relevant capability.
+
+    Only name a specific technology, framework, platform, or methodology as
+    a missing skill when:
+    - that specific technology is materially relevant to the inferred role,
+    - the role/context provides a strong reason to evaluate that technology,
+    - and the resume provides enough contextual evidence to make that
+      technology-specific gap meaningful.
+
+    Otherwise, describe the gap at the capability level.
+
+    Example:
+    Resume evidence: "processed 5 million+ customer profiles."
+    Better gap: "Large-scale data processing methods are not sufficiently
+    detailed."
+    Invalid inference: "Spark is missing."
+
+    Example:
+    Resume evidence: "designed user interfaces."
+    Better gap: "The design workflow and tools used are not sufficiently
+    demonstrated."
+    Invalid inference: "Figma is missing."
+
+    Do not use a popular industry technology as a proxy for an underlying
+    capability unless the resume and role context specifically justify it.
+
+13. Keep career and timeline recommendations temporally appropriate.
 
     Consider the candidate's stated graduation date, employment status,
-    and other timeline information when generating suggestions.
+    employment dates, and the current date when generating suggestions.
+
+    A role with a start date in the past and an end date of "Present"
+    represents ongoing employment and must not be treated as a future,
+    invalid, or inconsistent employment period.
 
     Do not recommend internships, graduation-related actions, or
     time-specific opportunities that conflict with the candidate's
@@ -98,7 +247,9 @@ CORE EVIDENCE RULES
     who has already graduated unless the resume or context clearly
     indicates that such an opportunity is appropriate.
 
-13. When discussing professional experience, describe what the resume
+    Current date: {current_date}
+
+14. When discussing professional experience, describe what the resume
     actually emphasizes rather than overstating what it does not contain.
 
     If the resume primarily demonstrates experience through independent
@@ -108,7 +259,7 @@ CORE EVIDENCE RULES
     Do not turn an absence of traditional employment into a stronger
     claim than the evidence supports.
 
-14. Every resume suggestion must be directly actionable and grounded
+15. Every resume suggestion must be directly actionable and grounded
     in evidence from the resume.
 
     Before generating each suggestion, identify the resume evidence or

@@ -1,6 +1,6 @@
 import json
 
-from backend.app.ai.gemini_client import generate_content
+from backend.app.ai.groq_client import generate_content
 from backend.app.services.fallback_questions import (
     BACKEND_QUESTIONS,
     AI_ENGINEER_QUESTIONS,

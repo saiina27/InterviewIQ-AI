@@ -13,7 +13,7 @@ from backend.app.logger import logger
 # Increment this whenever the analysis logic/prompt changes
 # enough that an old cached result should no longer be reused.
 #
-CURRENT_ANALYSIS_VERSION = 4
+CURRENT_ANALYSIS_VERSION = 7
 
 
 # ---------------------------------

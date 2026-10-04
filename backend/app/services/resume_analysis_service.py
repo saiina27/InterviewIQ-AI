@@ -39,40 +39,14 @@ def analyze_resume(
         ai_analysis = analyze_resume_with_ai(text)
 
     except Exception:
-
         logger.exception(
             "AI Resume Analyzer failed."
         )
 
-        return {
-            "ats_result": {
-                "ats_score": 0,
-                "breakdown": {
-                    "skills": 0,
-                    "projects": 0,
-                    "experience": 0,
-                    "education": 0,
-                    "keywords": 0
-                },
-                "matched_skills": [],
-                "missing_skills": []
-            },
-
-            "resume_suggestions": [],
-
-            "role_prediction": {
-                "predicted_role": "Unable to determine",
-                "domain": "Unknown"
-            },
-
-            "ai_resume_review": {
-                "summary": "AI resume analysis is temporarily unavailable.",
-                "strengths": [],
-                "weaknesses": [],
-                "rating": 0,
-                "resume_suggestions": []
-            }
-        }
+        # Do not return a fake zero-score analysis.
+        # The caller must preserve the candidate's existing valid analysis
+        # when the AI provider is temporarily unavailable.
+        raise
 
     # -------------------------------------------------
     # AI-driven ATS score
