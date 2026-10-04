@@ -80,3 +80,4 @@ six==1.17.0
 
 cffi==2.0.0
 pycparser==3.0
+groq==1.7.0
