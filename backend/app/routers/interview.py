@@ -184,12 +184,27 @@ def submit_answer(
         )
 
     # ----------------------------
+    # Fetch Interview
+    # ----------------------------
+    interview = db.query(Interview).filter(
+        Interview.id == request.interview_id
+    ).first()
+
+    if not interview:
+        raise HTTPException(
+            status_code=404,
+            detail="Interview not found"
+        )
+
+    # ----------------------------
     # AI Evaluation
     # ----------------------------
     try:
         evaluation = evaluate_answer(
             question=question.question,
-            answer=request.answer
+            answer=request.answer,
+            role=interview.role,
+            difficulty=interview.difficulty
         )
 
     except Exception as e:
@@ -321,7 +336,22 @@ def evaluate_answer_api(answer_id: int, db: Session = Depends(get_db)):
     question_text = question.question   # or question.question_text (depending on model)
     answer_text = answer.answer_text
 
-    evaluation = evaluate_answer(question_text, answer_text)
+    interview = db.query(Interview).filter(
+        Interview.id == answer.interview_id
+    ).first()
+
+    if not interview:
+        raise HTTPException(
+            status_code=404,
+            detail="Interview not found"
+        )
+
+    evaluation = evaluate_answer(
+        question=question_text,
+        answer=answer_text,
+        role=interview.role,
+        difficulty=interview.difficulty
+    )
 
     updated = update_answer_evaluation(db, answer_id, evaluation)
 
