@@ -36,9 +36,9 @@ def generate_interview_questions(
     skills_text = ", ".join(skills)
 
     prompt = f"""
-You are an expert technical interviewer.
+You are an expert interviewer conducting a realistic job interview.
 
-Generate exactly {count} interview questions.
+Generate exactly {count} interview questions for this candidate.
 
 Candidate Details:
 
@@ -47,6 +47,19 @@ Experience: {experience}
 Skills: {skills_text}
 Difficulty: {difficulty}
 
+Interview Rules:
+
+1. Questions MUST be relevant to the candidate's target role.
+2. Use the candidate's listed skills and experience as the primary basis for questions.
+3. Strictly respect the requested difficulty level: {difficulty}.
+4. Do NOT ask senior-level, expert-level, or highly specialized questions when the requested difficulty is Intermediate.
+5. Do NOT test unrelated technologies or concepts that are not relevant to the role or listed skills.
+6. Prefer practical, realistic job-interview questions over obscure definitions or theoretical terminology.
+7. For business/sales roles, focus on practical areas such as prospecting, lead generation, CRM usage, client communication, sales process, negotiation, market research, pipeline management, objection handling, and relevant metrics when applicable.
+8. Questions should allow the candidate to demonstrate reasoning and practical understanding.
+9. Keep the difficulty consistent across all questions.
+10. Return exactly {count} questions.
+
 Return ONLY valid JSON.
 
 Example:
@@ -54,7 +67,7 @@ Example:
 [
     {{
         "question_number": 1,
-        "question": "Explain REST APIs."
+        "question": "How would you approach generating and qualifying new B2B leads for a business?"
     }}
 ]
 """
