@@ -175,6 +175,27 @@ def build_interview_report(db: Session, interview_id: int):
 
         "integrity": integrity,
 
+        # TEMPORARY DEBUG DATA
+        # Used only to inspect the stored answers and evaluations
+        # for production interview analysis.
+        "answers": [
+            {
+                "question_id": ans.question_id,
+                "question": (
+                    ans.question.question
+                    if ans.question
+                    else None
+                ),
+                "answer": ans.answer_text,
+                "score": ans.score,
+                "relevance": ans.relevance,
+                "correctness": ans.correctness,
+                "feedback": ans.feedback,
+                "missing_points": ans.missing_points,
+            }
+            for ans in answers
+        ],
+
         "strong_skills": sorted(strong_skills),
         "medium_skills": sorted(medium_skills),
         "weak_skills": sorted(weak_skills),
