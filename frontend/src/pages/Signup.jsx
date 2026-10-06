@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { User, Mail, Lock } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -35,6 +35,12 @@ function Signup() {
 
     const [success,setSuccess] = useState("");
 
+    // Wake up the free-tier backend while the user fills the form
+    useEffect(() => {
+        if (!import.meta.env.VITE_API_URL) return;
+        fetch(import.meta.env.VITE_API_URL, { mode: "no-cors" }).catch(() => {});
+    }, []);
+
 
 
 
@@ -66,6 +72,7 @@ function Signup() {
 
         e.preventDefault();
 
+        if (loading) return;
 
         setError("");
 
@@ -361,6 +368,8 @@ function Signup() {
 
 
                 <button
+
+                    type="submit"
 
                     disabled={loading}
 

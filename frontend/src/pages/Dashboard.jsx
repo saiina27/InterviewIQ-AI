@@ -2,10 +2,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
-import Navbar from "../components/Navbar";
+import AppLayout from "../components/AppLayout";
+import EmptyDashboard from "../components/dashboard/EmptyDashboard";
 
 
-export default function Dashboard() {
+function DashboardContent() {
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -322,11 +323,10 @@ export default function Dashboard() {
 
             <>
 
-                <Navbar />
 
 
                 <div className="
-                    min-h-screen
+                    min-h-[60vh]
                     flex
                     items-center
                     justify-center
@@ -371,11 +371,10 @@ export default function Dashboard() {
 
             <>
 
-                <Navbar />
 
 
                 <div className="
-                    min-h-screen
+                    min-h-[60vh]
                     flex
                     items-center
                     justify-center
@@ -451,413 +450,13 @@ export default function Dashboard() {
 
 
     if (!resumeData && !interviewId) {
-        return (
-            <>
-                <Navbar />
-
-                <main className="
-                    relative min-h-[calc(100vh-64px)] overflow-hidden
-                    bg-gradient-to-br from-white via-indigo-50/60 to-blue-50
-                    px-5 py-8 sm:px-8 lg:px-12
-                ">
-
-                    <div className="
-                        pointer-events-none absolute -left-40 top-20
-                        h-96 w-96 rounded-full bg-indigo-200/30 blur-3xl
-                    " />
-
-                    <div className="
-                        pointer-events-none absolute -right-40 bottom-0
-                        h-[28rem] w-[28rem] rounded-full bg-blue-200/30 blur-3xl
-                    " />
-
-                    <div className="relative mx-auto max-w-7xl">
-
-                        {/* HEADER */}
-                        <div className="
-                            flex flex-col gap-6
-                            lg:flex-row lg:items-center lg:justify-between
-                        ">
-
-                            <div>
-
-                                <div className="
-                                    mb-4 inline-flex items-center gap-2
-                                    rounded-full border border-indigo-100
-                                    bg-white/80 px-4 py-2 text-xs font-bold
-                                    tracking-[0.18em] text-indigo-600 shadow-sm
-                                ">
-                                    ✦ AI INTERVIEW PREPARATION
-                                </div>
-
-                                <h1 className="
-                                    text-4xl font-black tracking-tight text-slate-900
-                                    sm:text-5xl lg:text-6xl
-                                ">
-                                    Welcome back,{" "}
-                                    <span className="
-                                        bg-gradient-to-r from-indigo-600
-                                        via-blue-600 to-purple-600
-                                        bg-clip-text text-transparent
-                                    ">
-                                        {(user?.full_name || "Sameer")
-                                            .split(" ")
-                                            .map(
-                                                (name) =>
-                                                    name.charAt(0).toUpperCase() +
-                                                    name.slice(1).toLowerCase()
-                                            )
-                                            .join(" ")}
-                                    </span>{" "}
-                                    👋
-                                </h1>
-
-                                <p className="
-                                    mt-4 text-base leading-7 text-slate-500 sm:text-lg
-                                ">
-                                    Let's turn your resume into interview confidence —
-                                    one step at a time.
-                                </p>
-
-                            </div>
-
-                            <button
-                                onClick={() => navigate("/upload")}
-                                className="
-                                    self-start rounded-2xl
-                                    bg-gradient-to-r from-indigo-600 to-blue-600
-                                    px-7 py-3.5 font-extrabold text-white
-                                    shadow-lg shadow-indigo-200 transition duration-300
-                                    hover:-translate-y-0.5 hover:shadow-xl
-                                    hover:shadow-indigo-300 active:scale-[0.98]
-                                    lg:self-center
-                                "
-                            >
-                                🚀 Upload Resume
-                            </button>
-
-                        </div>
-
-
-                        {/* MAIN HERO */}
-                        <section className="
-                            relative mt-10 overflow-hidden rounded-[2rem]
-                            border border-indigo-100 bg-white/80
-                            shadow-[0_25px_80px_rgba(79,70,229,0.12)]
-                            backdrop-blur-xl
-                        ">
-
-                            <div className="
-                                absolute inset-0
-                                bg-gradient-to-br from-indigo-50/50
-                                via-transparent to-blue-50/60
-                            " />
-
-                            <div className="
-                                relative z-10 grid items-center gap-8
-                                p-6 sm:p-8 lg:grid-cols-[1.1fr_0.9fr] lg:p-10
-                            ">
-
-                                {/* LEFT SIDE */}
-                                <div>
-
-                                    <p className="
-                                        text-xs font-bold uppercase
-                                        tracking-[0.22em] text-indigo-500
-                                    ">
-                                        Your interview journey
-                                    </p>
-
-                                    <h2 className="
-                                        mt-3 text-3xl font-black leading-tight
-                                        text-slate-900 sm:text-4xl
-                                    ">
-                                        From Resume → Interview Ready
-                                    </h2>
-
-                                    <p className="
-                                        mt-4 whitespace-nowrap text-sm
-                                        leading-6 text-slate-500
-                                    ">
-                                        InterviewIQ analyzes your profile, identifies your gaps and helps you practice before the real interview.
-                                    </p>
-
-
-                                    {/* WORKFLOW */}
-                                    <div className="relative mt-10">
-
-                                        <div className="
-                                            pointer-events-none absolute left-8 right-8
-                                            top-7 hidden h-[2px]
-                                            bg-gradient-to-r from-indigo-200
-                                            via-blue-300 to-purple-200 md:block
-                                        " />
-
-                                        <div className="
-                                            relative grid gap-4 sm:grid-cols-2 xl:grid-cols-4
-                                        ">
-
-                                            {/* 01 */}
-                                            <div className="
-                                                relative rounded-2xl border border-slate-100
-                                                bg-white p-4 shadow-sm transition duration-300
-                                                hover:-translate-y-1 hover:shadow-lg
-                                            ">
-                                                <div className="
-                                                    relative z-10 flex h-14 w-14
-                                                    items-center justify-center rounded-2xl
-                                                    bg-indigo-50 text-2xl
-                                                ">
-                                                    📄
-                                                </div>
-
-                                                <span className="
-                                                    absolute right-4 top-4 text-xs
-                                                    font-black text-slate-300
-                                                ">
-                                                    01
-                                                </span>
-
-                                                <h3 className="mt-4 font-extrabold text-slate-800">
-                                                    Upload Resume
-                                                </h3>
-
-                                                <p className="mt-1.5 text-xs leading-5 text-slate-500">
-                                                    Add your experience and skills.
-                                                </p>
-                                            </div>
-
-
-                                            {/* 02 */}
-                                            <div className="
-                                                relative rounded-2xl border border-slate-100
-                                                bg-white p-4 shadow-sm transition duration-300
-                                                hover:-translate-y-1 hover:shadow-lg
-                                            ">
-                                                <div className="
-                                                    relative z-10 flex h-14 w-14
-                                                    items-center justify-center rounded-2xl
-                                                    bg-blue-50 text-2xl
-                                                ">
-                                                    🎯
-                                                </div>
-
-                                                <span className="
-                                                    absolute right-4 top-4 text-xs
-                                                    font-black text-slate-300
-                                                ">
-                                                    02
-                                                </span>
-
-                                                <h3 className="mt-4 font-extrabold text-slate-800">
-                                                    AI Analysis
-                                                </h3>
-
-                                                <p className="mt-1.5 text-xs leading-5 text-slate-500">
-                                                    Discover your strengths and gaps.
-                                                </p>
-                                            </div>
-
-
-                                            {/* 03 */}
-                                            <div className="
-                                                relative rounded-2xl border border-slate-100
-                                                bg-white p-4 shadow-sm transition duration-300
-                                                hover:-translate-y-1 hover:shadow-lg
-                                            ">
-                                                <div className="
-                                                    relative z-10 flex h-14 w-14
-                                                    items-center justify-center rounded-2xl
-                                                    bg-purple-50 text-2xl
-                                                ">
-                                                    🤖
-                                                </div>
-
-                                                <span className="
-                                                    absolute right-4 top-4 text-xs
-                                                    font-black text-slate-300
-                                                ">
-                                                    03
-                                                </span>
-
-                                                <h3 className="mt-4 font-extrabold text-slate-800">
-                                                    AI Coaching
-                                                </h3>
-
-                                                <p className="mt-1.5 text-xs leading-5 text-slate-500">
-                                                    Improve weak areas with AI guidance.
-                                                </p>
-                                            </div>
-
-
-                                            {/* 04 */}
-                                            <div className="
-                                                relative rounded-2xl border border-slate-100
-                                                bg-white p-4 shadow-sm transition duration-300
-                                                hover:-translate-y-1 hover:shadow-lg
-                                            ">
-                                                <div className="
-                                                    relative z-10 flex h-14 w-14
-                                                    items-center justify-center rounded-2xl
-                                                    bg-pink-50 text-2xl
-                                                ">
-                                                    🎤
-                                                </div>
-
-                                                <span className="
-                                                    absolute right-4 top-4 text-xs
-                                                    font-black text-slate-300
-                                                ">
-                                                    04
-                                                </span>
-
-                                                <h3 className="mt-4 font-extrabold text-slate-800">
-                                                    Mock Interview
-                                                </h3>
-
-                                                <p className="mt-1.5 text-xs leading-5 text-slate-500">
-                                                    Practice with your AI interviewer.
-                                                </p>
-                                            </div>
-
-                                        </div>
-                                    </div>
-
-                                </div>
-
-
-                                {/* INTERVIEW GIF */}
-                                <div className="
-                                    relative flex min-h-[330px] items-center
-                                    justify-center overflow-hidden rounded-[1.75rem]
-                                    border border-indigo-100
-                                    bg-gradient-to-br from-indigo-50 via-white to-blue-50
-                                ">
-
-                                    <div className="
-                                        absolute -right-10 -top-10 h-32 w-32
-                                        rounded-full bg-indigo-200/40 blur-2xl
-                                    " />
-
-                                    <div className="
-                                        absolute -bottom-10 -left-10 h-32 w-32
-                                        rounded-full bg-blue-200/40 blur-2xl
-                                    " />
-
-                                    <div className="relative text-center">
-
-                                        <div className="
-                                            mb-4 inline-flex items-center gap-2
-                                            rounded-full bg-white px-4 py-2
-                                            text-xs font-bold text-indigo-600 shadow-md
-                                        ">
-                                            🎤 LIVE INTERVIEW MODE
-                                        </div>
-
-                                        <img
-                                            src="/ai-coach.gif"
-                                            alt="AI interviewer"
-                                            className="
-                                                mx-auto h-56 w-72 object-contain
-                                                drop-shadow-xl sm:h-64 sm:w-80
-                                            "
-                                        />
-
-                                        <div className="
-                                            mt-3 font-black text-slate-800
-                                        ">
-                                            Your AI interviewer is warming up...
-                                        </div>
-
-                                        <p className="
-                                            mt-1 text-xs text-slate-500
-                                        ">
-                                            Upload your resume to start the conversation.
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-
-                            {/* CTA */}
-                            <div className="
-                                relative z-10 mx-6 mb-6 flex flex-col
-                                items-center justify-between gap-5 rounded-3xl
-                                border border-indigo-100
-                                bg-gradient-to-r from-indigo-50 via-blue-50 to-purple-50
-                                p-5 sm:mx-8 sm:mb-8 sm:flex-row sm:p-6
-                                lg:mx-10 lg:mb-10
-                            ">
-
-                                <div className="flex items-center gap-4">
-
-                                    <div className="
-                                        flex h-12 w-12 shrink-0 items-center
-                                        justify-center rounded-2xl bg-white
-                                        text-xl shadow-sm
-                                    ">
-                                        ✨
-                                    </div>
-
-                                    <div>
-
-                                        <p className="font-extrabold text-slate-800">
-                                            Ready for your first interview?
-                                        </p>
-
-                                        <p className="mt-1 text-sm text-slate-500">
-                                            Upload your resume and let InterviewIQ take it from here.
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-                                <button
-                                    onClick={() => navigate("/upload")}
-                                    className="
-                                        w-full rounded-2xl
-                                        bg-gradient-to-r from-indigo-600 to-blue-600
-                                        px-8 py-4 font-black text-white
-                                        shadow-lg shadow-indigo-200 transition duration-300
-                                        hover:-translate-y-1 hover:shadow-xl
-                                        active:scale-[0.98] sm:w-auto
-                                    "
-                                >
-                                    🚀 Start My Journey
-                                </button>
-
-                            </div>
-
-                        </section>
-
-
-                        <div className="
-                            mt-5 flex flex-wrap justify-center gap-x-8 gap-y-2
-                            text-xs font-medium text-slate-400
-                        ">
-                            <span>✦ Personalized analysis</span>
-                            <span>✦ AI-powered coaching</span>
-                            <span>✦ Interview performance insights</span>
-                        </div>
-
-                    </div>
-
-                </main>
-            </>
-        );
+        return <EmptyDashboard user={user} />;
     }
-
-
 
     return (
         <>
-            <Navbar />
 
-            <main className="min-h-screen bg-slate-50">
+            <div>
                 <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 
                     {/* HERO */}
@@ -898,7 +497,7 @@ export default function Dashboard() {
                     </section>
 
                     {/* QUICK STATUS */}
-                    <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
 
                         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                             <div className="flex items-center justify-between">
@@ -1305,7 +904,7 @@ export default function Dashboard() {
                         ✦ Interview performance insights
                     </div>
                 </div>
-            </main>
+            </div>
         </>
     );
 
@@ -1435,4 +1034,13 @@ function AnalyticsCard({title,value}) {
 
     );
 
-}    
+}
+
+
+export default function Dashboard() {
+    return (
+        <AppLayout>
+            <DashboardContent />
+        </AppLayout>
+    );
+}
