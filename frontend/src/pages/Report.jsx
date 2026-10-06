@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
+import ReportLoader from "../components/ReportLoader";
+
+// The loader stays on screen at least this long so it never just flashes
+const MIN_LOADER_MS = 2200;
 
 export default function Report() {
   const { interviewId } = useParams();
@@ -11,6 +15,7 @@ export default function Report() {
 
   useEffect(() => {
     (async () => {
+      const startedAt = Date.now();
       try {
         const res = await api.get(`/interview/report/${interviewId}`);
         setReport(res.data.report);
@@ -18,28 +23,13 @@ export default function Report() {
         console.error(err);
         alert("Unable to load report.");
       } finally {
-        setLoading(false);
+        const wait = Math.max(0, MIN_LOADER_MS - (Date.now() - startedAt));
+        setTimeout(() => setLoading(false), wait);
       }
     })();
   }, [interviewId]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100">
-        <div className="bg-white rounded-3xl shadow-xl p-10 text-center">
-          <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white text-2xl">
-            ✦
-          </div>
-          <h1 className="text-2xl font-bold text-slate-800">
-            Preparing Your Report
-          </h1>
-          <p className="text-gray-500 mt-2">
-            Analyzing your interview performance...
-          </p>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <ReportLoader />;
 
   if (!report) {
     return (
