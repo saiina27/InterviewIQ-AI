@@ -54,98 +54,101 @@ def calculate_ats_score(
     # -------------------------------------------------
     # 2. Experience & practical evidence — 20 points
     #
-    # Professional experience: up to 12
-    # Practical/project evidence: up to 8
+    # Professional experience is based on actual date-range
+    # evidence rather than section-heading keywords.
+    # Practical evidence is role-neutral and rewards
+    # demonstrated work/actions across different professions.
     # -------------------------------------------------
 
-    professional_indicators = [
-        "work experience",
-        "professional experience",
-        "employment",
-        "internship",
-        "internships",
-        "intern ",
-        "freelance",
-        "freelancer",
-        "contract work",
-        "contractor",
-        "consultant",
-        "consulting",
-    ]
+    import re
 
-    professional_evidence = sum(
-        text.count(keyword)
-        for keyword in professional_indicators
+    date_ranges = re.findall(
+        r"\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|"
+        r"may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|"
+        r"oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)?\s*"
+        r"20\d{2}\s*(?:-|–|—|to)\s*"
+        r"(?:present|current|(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|"
+        r"apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|"
+        r"sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)?\s*20\d{2})",
+        text,
     )
 
-    if professional_evidence >= 4:
-        professional_score = 12
-    elif professional_evidence >= 2:
+    if len(date_ranges) >= 3:
+        professional_score = 20
+    elif len(date_ranges) >= 2:
+        professional_score = 17
+    elif len(date_ranges) >= 1:
         professional_score = 10
-    elif professional_evidence >= 1:
-        professional_score = 8
     else:
         professional_score = 0
 
-    practical_indicators = [
-        "built",
-        "developed",
-        "designed",
-        "implemented",
-        "deployed",
-        "integrated",
-        "created",
-        "tested",
-        "architected",
-    ]
+    # Count distinct evidence categories rather than repeated
+    # generic action verbs. This prevents repeated words such as
+    # "performed" or "collaborated" from inflating the score.
+
+    practical_categories = {
+        "technical_or_domain_work": [
+            "built", "developed", "designed", "implemented",
+            "deployed", "integrated", "created", "tested",
+            "architected", "administered", "treated",
+        ],
+        "management_or_ownership": [
+            "managed", "coordinated", "supervised", "led",
+            "organized", "handled",
+        ],
+        "analysis_or_monitoring": [
+            "analyzed", "monitored", "assessed", "conducted",
+        ],
+        "training_or_support": [
+            "trained", "supported", "provided", "maintained",
+            "delivered",
+        ],
+        "collaboration": [
+            "collaborated",
+        ],
+    }
+
+    evidence_categories = sum(
+        any(keyword in text for keyword in indicators)
+        for indicators in practical_categories.values()
+    )
 
     practical_evidence = sum(
         text.count(keyword)
-        for keyword in practical_indicators
+        for indicators in practical_categories.values()
+        for keyword in indicators
     )
 
-    if practical_evidence >= 8:
+    # Experience receives a modest bonus for demonstrated practical
+    # work, without allowing repeated generic verbs to dominate.
+    if evidence_categories >= 4:
         practical_score = 8
-    elif practical_evidence >= 5:
+    elif evidence_categories >= 3:
         practical_score = 7
-    elif practical_evidence >= 3:
+    elif evidence_categories >= 2:
         practical_score = 5
-    elif practical_evidence >= 1:
+    elif evidence_categories >= 1:
         practical_score = 3
     else:
         practical_score = 0
 
-    experience_score = min(
-        20,
-        professional_score + practical_score
-    )
+    experience_score = professional_score
 
     # -------------------------------------------------
     # 3. Projects / practical application — 15 points
+    #
+    # Kept under the existing "projects" response key for
+    # compatibility. The score reflects breadth of demonstrated
+    # practical application rather than requiring software projects.
     # -------------------------------------------------
 
-    project_indicators = [
-        "project",
-        "projects",
-        "github",
-        "built",
-        "developed",
-        "implemented",
-        "deployed",
-    ]
-
-    project_evidence = sum(
-        text.count(keyword)
-        for keyword in project_indicators
-    )
-
-    if project_evidence >= 8:
+    if evidence_categories >= 5 and practical_evidence >= 8:
         project_score = 15
-    elif project_evidence >= 5:
+    elif evidence_categories >= 4 and practical_evidence >= 6:
         project_score = 13
-    elif project_evidence >= 3:
+    elif evidence_categories >= 3 and practical_evidence >= 4:
         project_score = 10
-    elif project_evidence >= 1:
+    elif evidence_categories >= 1 and practical_evidence >= 1:
         project_score = 6
     else:
         project_score = 0
@@ -161,6 +164,20 @@ def calculate_ats_score(
         "master",
         "m.tech",
         "mtech",
+        "bsn",
+        "b.s.",
+        "bs",
+        "b.a.",
+        "ba",
+        "ms",
+        "m.s.",
+        "ma",
+        "m.a.",
+        "mba",
+        "phd",
+        "ph.d.",
+        "md",
+        "jd",
         "degree",
         "university",
         "college",
