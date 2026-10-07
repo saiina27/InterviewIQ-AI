@@ -869,9 +869,9 @@ Dockerized application with a production frontend/backend/database architecture.
 
 ---
 
-# 👀 For a non-technical recruiter
+# 👀 For a non-technical person
 
-If you only have **30 seconds**, this is the project:
+this is the project:
 
 > **InterviewIQ AI is a complete AI-powered interview preparation platform. A candidate uploads their resume, receives an ATS-style analysis and role recommendation, then takes a personalized mock interview. The system evaluates each answer, monitors basic interview integrity, and generates a detailed performance report that the candidate can download as a PDF.**
 
