@@ -1,0 +1,5 @@
+
+User-agent: *
+Allow: /
+
+Sitemap: https://interview-iq-ai-lyart.vercel.app/sitemap.xml
